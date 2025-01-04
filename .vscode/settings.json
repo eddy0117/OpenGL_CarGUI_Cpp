@@ -73,6 +73,8 @@
         "any": "cpp",
         "forward_list": "cpp",
         "ranges": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "__functional_base": "cpp",
+        "locale": "cpp"
     }
 }

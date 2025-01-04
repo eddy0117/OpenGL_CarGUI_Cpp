@@ -29,12 +29,13 @@ public:
 private:
     void set_up_glfw();
 
-    void my_func();
+    void my_func(std::queue<std::vector<std::unordered_map<std::string, std::string>>> &frame_queue);
 
     GLFWwindow* window;
 
     unsigned int shader;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
+    std::queue<std::vector<std::unordered_map<std::string, std::string>>> frame_queue;
     //Systems
     CameraSystem* cameraSystem;
     RenderSystem* renderSystem;

@@ -100,15 +100,15 @@ RenderComponent Factory::make_obj_mesh(
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), 
         vertices.data(), GL_STATIC_DRAW);
     //position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 32, (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 32, (void*)0);
     //texture coordinates
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 32, (void*)12);
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 32, (void*)12);
     //normal
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 32, (void*)20);
     glEnableVertexAttribArray(2);
-
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 32, (void*)20);
+    
     RenderComponent render;
     render.VAO = VAO;
     render.vertexCount = vertices.size() / 8;
@@ -155,7 +155,7 @@ void Factory::read_corner(std::string description,
     vertices.push_back(pos[1]);
     vertices.push_back(pos[2]);
 
-    //tex coord
+    //tex coord (UV)
     glm::vec2 texcoord = vt[std::stol(v_vt_vn[1]) - 1];
     vertices.push_back(texcoord[0]);
     vertices.push_back(texcoord[1]);

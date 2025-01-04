@@ -1,20 +1,30 @@
 #include "app.h"
 
 using json = nlohmann::json;
-void App::my_func() {
+// frame_queue 要以 ref 傳入
+void App::my_func(std::queue<std::vector<std::unordered_map<std::string, std::string>>> &frame_queue) {
 	int i = 0;
-	while (1) {
-		// std::cout << "Hello this is 老師請問今天有要開會嗎from another thread" << std::endl;
-		cur_frame_objs.push_back({
-			{"x", "0.0"},
-			{"y", std::to_string(-5.0f + 1.0f * i)},
-			{"cls", "pedestrian"},
-			{"ang", std::to_string(10.0f * i)},
-		});
-		sleep(1);
-		i++;
-	}
+	json j;
+	std::ifstream jfile("../json/result_vec_ordered.json");
+	jfile >> j;
+	jfile.close();
 	
+	for(auto& frame: j){
+		
+		std::vector<std::unordered_map<std::string, std::string>> queue_frame_objs;
+		for(auto& obj: frame){
+
+			queue_frame_objs.push_back({
+				{"x", std::to_string(obj["x"].get<float>() / 682)},
+				{"y", std::to_string(obj["y"].get<float>() / 682)},
+				{"cls", obj["class"].get<std::string>()},
+				{"ang", std::to_string(obj["distance_ang"].get<float>() + 90)},
+			});
+		}
+		frame_queue.push(queue_frame_objs);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+	}
 }
 
 App::App() {
@@ -34,26 +44,26 @@ void App::run() {
 	TransformComponent transform;
 	transform.position = {5.0f, 0.0f, 0.0f};
 	transform.eulers = {0.0f, 50.0f, 0.0f};
-
-	std::thread t1(&App::my_func, this);
+	
+	std::thread t1(&App::my_func, this, std::ref(frame_queue));
 	// t1.join();
 
-	cur_frame_objs.push_back({
-		{"x", "5.0"},
-		{"y", "0.0"},
-		{"cls", "car"},
-		{"ang", "45.0"},
-	});
+	// cur_frame_objs.push_back({
+	// 	{"x", "5.0"},
+	// 	{"y", "0.0"},
+	// 	{"cls", "car"},
+	// 	{"ang", "45.0"},
+	// });
 
-	cur_frame_objs.push_back({
-		{"x", "5.0"},
-		{"y", "3.0"},
-		{"cls", "pedestrian"},
-		{"ang", "0.0"},
-	});
+	// cur_frame_objs.push_back({
+	// 	{"x", "5.0"},
+	// 	{"y", "3.0"},
+	// 	{"cls", "pedestrian"},
+	// 	{"ang", "0.0"},
+	// });
 
-	json j;
-	j.push_back(cur_frame_objs[0]);
+	// json j;
+	// j.push_back(cur_frame_objs[0]);
 	// str to float
 	// std::stof("3.0")
 	float ang = 0.0f;
@@ -67,25 +77,43 @@ void App::run() {
 			break;
 		}
 
-		int i = 0;
-		for(auto& [cls, renderable] : model_dict){
-			TransformComponent transform;
-			transform.position = {5.0f, -6.0f + 2.2f * i, 0.0f};
-			transform.eulers = {0.0f, 0.0f, ang};
-			renderSystem->draw_model(renderable, transform);
-			i++;
-		}
+		// int i = 0;
+		// for(auto& [cls, renderable] : model_dict){
+		// 	TransformComponent transform;
+		// 	transform.position = {5.0f, -6.0f + 2.2f * i, 0.0f};
+		// 	transform.eulers = {0.0f, 0.0f, ang};
+		// 	renderSystem->draw_model(renderable, transform);
+		// 	i++;
+		// }
+		
+		if (!frame_queue.empty()) {
+			std::vector<std::unordered_map<std::string, std::string>> queue_frame_objs;
+			queue_frame_objs = frame_queue.front();
+			frame_queue.pop();
+			queue_frame_objs.push_back({
+				{"x", "0.0"},
+				{"y", "0.0"},
+				{"cls", "ego_car"},
+				{"ang", "180.0"},
+			});
+			cur_frame_objs = queue_frame_objs;
+		}	
+		
 
+		
+	
 		for(auto& obj : cur_frame_objs){
-			float coord_x = std::stof(obj["x"]);
-			float coord_y = std::stof(obj["y"]);
-			float angle = std::stof(obj["ang"]);
+			float coord_y = -std::stof(obj["x"]) * 35 ;
+			float coord_x = -std::stof(obj["y"]) * 35 + 5;
+			float angle = std::stof(obj["ang"]) + 180;
 			std::string obj_name = obj["cls"];
 			TransformComponent transform;
 			transform.position = {coord_x, coord_y, 0.0f};
 			transform.eulers = {0.0f, 0.0f, angle};
 			renderSystem->draw_model(model_dict[obj_name], transform);
 		}
+	
+		
 
 		// renderSystem->update(transformComponents, renderComponents);
 		// renderSystem->draw_model(model_dict["car"], transform);
