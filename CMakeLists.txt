@@ -3,6 +3,7 @@ project(OpenGL_CarGUI VERSION 1.0.0)
 cmake_policy(SET CMP0072 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 find_package(OpenGL REQUIRED)
 
@@ -25,5 +26,5 @@ target_include_directories(OpenGL_CarGUI
 
 target_link_libraries(OpenGL_CarGUI
     glfw
-    OpenGL::GL 
+    OpenGL::GL ${CMAKE_DL_LIBS}
 )
