@@ -21,7 +21,11 @@ int main() {
 		{"truck", {"truck.obj", "truck.jpg"}}, 
 		{"bus", {"bus.obj", "bus.jpg"}},
 		{"traffic_cone", {"cone.obj", "cone.png"}},
-		{"car", {"modern_car.obj", "modern_car.jpg"}}
+		{"car", {"modern_car.obj", "modern_car.jpg"}},
+		{"0", {"cube.obj", "side.png"}},
+		{"1", {"cube.obj", "crossroas.png"}},
+		{"2", {"cube.obj", "roadline.png"}},
+
 	};
 
 	// 產生 unordered map, key 是 obj name, value 是 (texture idx, VAO idx, vertex count)

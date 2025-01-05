@@ -1,5 +1,6 @@
 #include "../config.h"
 
+using json = nlohmann::json;
 
-void recv_data(std::queue<std::vector<std::unordered_map<std::string, std::string>>> &frame_queue);
+void recv_data(std::queue<json> &queue_j);
 

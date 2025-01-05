@@ -5,16 +5,17 @@
 #define port 65432
 #define ip_addr "127.0.0.1"
 
-using json = nlohmann::json;
 
-void recv_data(std::queue<std::vector<std::unordered_map<std::string, std::string>>> &frame_queue) {
+
+void recv_data(std::queue<json> &queue_j) {
 	// frame_queue 要以 ref 傳入
 
 	// json j;
 	// std::ifstream jfile("../json/result_vec_ordered.json");
 	// jfile >> j;
 	// jfile.close();
-
+    
+    int MAX_CHUNK_SIZE = 5000;
     int sockfd, newfd;
     socklen_t addrlen;
 	struct sockaddr_in serverAddr, clientAddr;
@@ -38,24 +39,21 @@ void recv_data(std::queue<std::vector<std::unordered_map<std::string, std::strin
 
     std::cout << "wait for connection..." << std::endl;
 
-    // std::vector<std::string> sp_test = split("11sadfgsafasdf1~123asdfasgasgasdgasgda3", "~");
-    // std::cout << sp_test[0] << sp_test[1].substr(0, 5) << std::endl;
-
     addrlen = sizeof(clientAddr);
     while(1){
-        char indata[5002] = {0};
+        // BUG? 不能定義 MAX_CHUNK_SIZE 變數, 只能直接輸入值到宣告的長度
+        char indata[5000] = {0};
         std::string whole_data, data_cat;
         // 阻塞, 直到有新連接
         newfd = accept(sockfd, (struct sockaddr *)&clientAddr, &addrlen);
         std::cout << "connected by: " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
         while (1) {
-            int nbyte = recv(newfd, indata, 5000, 0);
+            int nbyte = recv(newfd, indata, sizeof(indata), 0);
             if (nbyte <= 0) {
                 close(newfd);
                 std::cout << "connection closed" << std::endl;
                 break;
             }
-            // std::cout << "indata: " << indata << std::endl;
 
             std::vector<std::string> data_split = split(indata, "~");
 
@@ -67,17 +65,31 @@ void recv_data(std::queue<std::vector<std::unordered_map<std::string, std::strin
                 
                 try {
                     auto j = json::parse(whole_data);
-                	std::vector<std::unordered_map<std::string, std::string>> queue_frame_objs;
-                 
+
+                    std::vector<std::vector<std::unordered_map<std::string, std::string>>> cur_frame_data;
+
+                	std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
                 	for(auto& obj: j["obj"]){
-                		queue_frame_objs.push_back({
+                		cur_frame_objs.push_back({
                 			{"x", std::to_string(obj["x"].get<float>())},
                 			{"y", std::to_string(obj["y"].get<float>())},
                 			{"cls", obj["cls"].get<std::string>()},
                 			{"ang", std::to_string(obj["ang"].get<float>())},
                 		});
                 	}
-                    frame_queue.push(queue_frame_objs);
+                    cur_frame_data.push_back(cur_frame_objs);
+
+                    // std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
+                    // for(auto& dot: j["dot"]){
+                	// 	cur_frame_dots.push_back({
+                	// 		{"x", std::to_string(dot["x"].get<float>())},
+                	// 		{"y", std::to_string(dot["y"].get<float>())},
+                	// 		{"cls", std::to_string(dot["cls"].get<float>())},
+                	// 	});
+                	// }
+                    // cur_frame_data.push_back(cur_frame_dots);
+
+                    queue_j.push(j);
                 }
                 catch (const std::exception& e){
                     std::cout << e.what() << std::endl;
@@ -98,24 +110,6 @@ void recv_data(std::queue<std::vector<std::unordered_map<std::string, std::strin
                 // 需手動將 buffer 清空
                 memset(indata, 0, sizeof(indata));
             }
-            
-            // std::cout << "================================" << std::endl;
         }
     }
-	// for(auto& frame: j){
-		
-	// 	std::vector<std::unordered_map<std::string, std::string>> queue_frame_objs;
-	// 	for(auto& obj: frame){
-
-	// 		queue_frame_objs.push_back({
-	// 			{"x", std::to_string(obj["x"].get<float>() / 682)},
-	// 			{"y", std::to_string(obj["y"].get<float>() / 682)},
-	// 			{"cls", obj["class"].get<std::string>()},
-	// 			{"ang", std::to_string(obj["distance_ang"].get<float>() + 90)},
-	// 		});
-	// 	}
-	// 	frame_queue.push(queue_frame_objs);
-	// 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-	// }
 }

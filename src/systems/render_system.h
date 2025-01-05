@@ -15,6 +15,12 @@ public:
     void draw_model(
         RenderComponent& renderable, 
         TransformComponent& transform);
+
+    void draw_line(
+        RenderComponent& renderable, 
+        std::vector<float>& x_list,
+        std::vector<float>& z_list,
+        std::vector<float>& y_list);
     
 private:
 

@@ -30,14 +30,17 @@ public:
 
 private:
     void set_up_glfw();
-
-    void my_func(std::queue<std::vector<std::unordered_map<std::string, std::string>>> &frame_queue);
-
+    void clear_last_frame_data();
+    void draw_screen();
+    void draw_ego_car();
     GLFWwindow* window;
 
     unsigned int shader;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
-    std::queue<std::vector<std::unordered_map<std::string, std::string>>> frame_queue;
+    std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
+    std::queue<std::vector<std::vector<std::unordered_map<std::string, std::string>>>> frame_queue;
+    std::queue<nlohmann::json> queue_j;
+    nlohmann::json cur_frame_data;
     //Systems
     CameraSystem* cameraSystem;
     RenderSystem* renderSystem;
