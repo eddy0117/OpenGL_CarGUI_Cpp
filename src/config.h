@@ -17,9 +17,13 @@
 #include <string>
 
 #include <thread>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 // #include <unistd.h>
+#include <codecvt>
 #include <chrono>
 #include <nlohmann/json.hpp>
-#include <sys/socket.h>
+
 
 std::vector<std::string> split(std::string line, std::string delimiter);

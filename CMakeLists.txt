@@ -15,6 +15,7 @@ add_executable(OpenGL_CarGUI
     src/factories/factory.cpp
     src/systems/camera_system.cpp
     src/systems/render_system.cpp
+    src/threads/socket_thread.cpp
     src/view/shader.cpp
     src/controller/app.cpp
 )

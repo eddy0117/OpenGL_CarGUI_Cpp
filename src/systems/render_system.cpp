@@ -46,6 +46,8 @@ void RenderSystem::draw_model(
     
     glBindTexture(GL_TEXTURE_2D, renderable.material);
     glBindVertexArray(renderable.VAO);
+
+    // 向 GPU 發出 DrawCall 指令
     glDrawArrays(GL_TRIANGLES, 0, renderable.vertexCount);
 
 }

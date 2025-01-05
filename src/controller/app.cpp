@@ -1,34 +1,7 @@
 #include "app.h"
 
-using json = nlohmann::json;
-// frame_queue 要以 ref 傳入
-void App::my_func(std::queue<std::vector<std::unordered_map<std::string, std::string>>> &frame_queue) {
-	int i = 0;
-	json j;
-	std::ifstream jfile("../json/result_vec_ordered.json");
-	jfile >> j;
-	jfile.close();
-	
-	for(auto& frame: j){
-		
-		std::vector<std::unordered_map<std::string, std::string>> queue_frame_objs;
-		for(auto& obj: frame){
-
-			queue_frame_objs.push_back({
-				{"x", std::to_string(obj["x"].get<float>() / 682)},
-				{"y", std::to_string(obj["y"].get<float>() / 682)},
-				{"cls", obj["class"].get<std::string>()},
-				{"ang", std::to_string(obj["distance_ang"].get<float>() + 90)},
-			});
-		}
-		frame_queue.push(queue_frame_objs);
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-	}
-}
-
 App::App() {
-    set_up_glfw();
+	set_up_glfw();
 }
 
 App::~App() {
@@ -36,7 +9,7 @@ App::~App() {
 
     delete cameraSystem;
     delete renderSystem;
-    
+    // std::terminate();
     glfwTerminate();
 }
 
@@ -45,46 +18,24 @@ void App::run() {
 	transform.position = {5.0f, 0.0f, 0.0f};
 	transform.eulers = {0.0f, 50.0f, 0.0f};
 	
-	std::thread t1(&App::my_func, this, std::ref(frame_queue));
-	// t1.join();
+	std::thread socket_thread(recv_data, std::ref(frame_queue)); 
 
-	// cur_frame_objs.push_back({
-	// 	{"x", "5.0"},
-	// 	{"y", "0.0"},
-	// 	{"cls", "car"},
-	// 	{"ang", "45.0"},
-	// });
-
-	// cur_frame_objs.push_back({
-	// 	{"x", "5.0"},
-	// 	{"y", "3.0"},
-	// 	{"cls", "pedestrian"},
-	// 	{"ang", "0.0"},
-	// });
-
-	// json j;
-	// j.push_back(cur_frame_objs[0]);
-	// str to float
-	// std::stof("3.0")
 	float ang = 0.0f;
+	cameraSystem->update(
+		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
+
     while (!glfwWindowShouldClose(window)) {
 		ang += 1.0f;
 		transform.eulers.z = ang;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        bool should_close = cameraSystem->update(
-            transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
-		if (should_close) {
+
+		//TODO 可將 cameraSystem Update 移至迴圈外 (由於view不會改變)
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 			break;
 		}
+		// 處理 eventloop 的所有 event, ESC 跳出指令才會觸發
+		glfwPollEvents();
 
-		// int i = 0;
-		// for(auto& [cls, renderable] : model_dict){
-		// 	TransformComponent transform;
-		// 	transform.position = {5.0f, -6.0f + 2.2f * i, 0.0f};
-		// 	transform.eulers = {0.0f, 0.0f, ang};
-		// 	renderSystem->draw_model(renderable, transform);
-		// 	i++;
-		// }
 		
 		if (!frame_queue.empty()) {
 			std::vector<std::unordered_map<std::string, std::string>> queue_frame_objs;
@@ -114,10 +65,6 @@ void App::run() {
 		}
 	
 		
-
-		// renderSystem->update(transformComponents, renderComponents);
-		// renderSystem->draw_model(model_dict["car"], transform);
-		// renderSystem->draw_model(model_dict["pedestrian"], transform2);
 		glfwSwapBuffers(window);
 	}
 }
@@ -158,7 +105,8 @@ void App::set_up_opengl() {
     shader = make_shader(
 		"../src/shaders/vertex.txt", 
 		"../src/shaders/fragment.txt");
-    
+
+    // 設定接下來繪製時要用的 shader 程式
     glUseProgram(shader);
 	unsigned int projLocation = glGetUniformLocation(shader, "projection");
 	glm::mat4 projection = glm::perspective(
@@ -170,3 +118,4 @@ void App::make_systems() {
     cameraSystem = new CameraSystem(shader, window);
     renderSystem = new RenderSystem(shader, window);
 }
+

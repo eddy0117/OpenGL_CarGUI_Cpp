@@ -1,9 +1,5 @@
 #include "../config.h"
 
-class SocketThread {
-public:
-    SocketThread();
-    ~SocketThread();
 
-private:
-};
+void recv_data(std::queue<std::vector<std::unordered_map<std::string, std::string>>> &frame_queue);
+

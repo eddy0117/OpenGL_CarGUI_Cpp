@@ -10,6 +10,7 @@
 
 #include "../view/shader.h"
 
+#include "../threads/socket_thread.h"
 class App {
 public:
     App();
@@ -17,6 +18,7 @@ public:
     void run();
     void set_up_opengl();
     void make_systems();
+
 
     //Components
     std::unordered_map<unsigned int, TransformComponent> transformComponents;

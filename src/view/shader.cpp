@@ -6,17 +6,19 @@ unsigned int make_shader(
 	//To store all the shader modules
 	std::vector<unsigned int> modules;
 
-	//Add a vertex shader module
-	modules.push_back(make_module(vertex_filepath, GL_VERTEX_SHADER));
+	// (Compile)
+	// 分別編譯 vertex shader 和 fragment shader 為中間檔案
 
-	//Add a fragment shader module
+	modules.push_back(make_module(vertex_filepath, GL_VERTEX_SHADER));
 	modules.push_back(make_module(fragment_filepath, GL_FRAGMENT_SHADER));
 
-	//Attach all the modules then link the program
+	// 建立一個可執行的對象容器, 並分別把 vertex shader & fragment shader 放進去
 	unsigned int shader = glCreateProgram();
 	for (unsigned int shaderModule : modules) {
 		glAttachShader(shader, shaderModule);
 	}
+	// (Link)
+	// 將放進容器的 shader 檔案進行串接, 成為完整的可執行程式
 	glLinkProgram(shader);
 
 	//Check the linking worked
@@ -28,7 +30,7 @@ unsigned int make_shader(
 		std::cout << "Shader linking error:\n" << errorLog << '\n';
 	}
 
-	//Modules are now unneeded and can be freed
+	// 容器已經建立好並串接程可執行檔, 原本編譯好的 shader 中間檔案可以刪除
 	for (unsigned int shaderModule : modules) {
 		glDeleteShader(shaderModule);
 	}
