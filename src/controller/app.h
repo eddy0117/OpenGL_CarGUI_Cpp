@@ -38,7 +38,7 @@ private:
     unsigned int shader;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
-    std::queue<std::vector<std::vector<std::unordered_map<std::string, std::string>>>> frame_queue;
+    // std::queue<std::vector<std::vector<std::unordered_map<std::string, std::string>>>> frame_queue;
     std::queue<nlohmann::json> queue_j;
     nlohmann::json cur_frame_data;
     //Systems

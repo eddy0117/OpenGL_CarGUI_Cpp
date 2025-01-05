@@ -110,8 +110,8 @@ void App::set_up_opengl() {
     glCullFace(GL_BACK);
 
     shader = make_shader(
-		"../src/shaders/vertex.txt", 
-		"../src/shaders/fragment.txt");
+		"src/shaders/vertex.txt", 
+		"src/shaders/fragment.txt");
 
     // 設定接下來繪製時要用的 shader 程式
     glUseProgram(shader);
