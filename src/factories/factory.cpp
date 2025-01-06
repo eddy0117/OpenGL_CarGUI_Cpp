@@ -27,8 +27,9 @@ unsigned int Factory::make_camera(glm::vec3 position, glm::vec3 eulers) {
 
 
 // 產出多個物件的 VAO, texture的 dict
-std::unordered_map<std::string, RenderComponent> Factory::make_obj_list(std::unordered_map<std::string, std::vector<std::string>> file_path_list, 
-                                                    glm::vec3 eulers) {
+std::unordered_map<std::string, RenderComponent> Factory::make_obj_list(std::unordered_map<std::string, 
+                                                                        std::vector<std::string>> file_path_list, 
+                                                                        glm::vec3 eulers) {
 	
     std::unordered_map<std::string, RenderComponent> model_dict;
     glm::mat4 preTransform = glm::mat4(0.8f);
@@ -45,9 +46,7 @@ std::unordered_map<std::string, RenderComponent> Factory::make_obj_list(std::uno
         render.material = make_texture((img_path_prefix + img_path).c_str());
         model_dict[cls] = render;
     }
-
-    return model_dict;
-	// renderComponents[entities_made++] = render;
+    return model_dict; 
 }
 
 

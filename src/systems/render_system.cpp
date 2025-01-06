@@ -3,6 +3,8 @@
 RenderSystem::RenderSystem(unsigned int shader, GLFWwindow* window) {
     
     modelLocation = glGetUniformLocation(shader, "model");
+
+    // 由於成員變數與參數同名，所以使用 this pointer 來指定成員變數
     this->window = window;
 }
     

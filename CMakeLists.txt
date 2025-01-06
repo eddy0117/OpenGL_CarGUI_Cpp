@@ -3,7 +3,7 @@ project(OpenGL_CarGUI VERSION 1.0.0)
 cmake_policy(SET CMP0072 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # multithreading support
 
 find_package(OpenGL REQUIRED)
 
