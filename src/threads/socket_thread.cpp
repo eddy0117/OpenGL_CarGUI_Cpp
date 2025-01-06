@@ -65,51 +65,27 @@ void recv_data(std::queue<json> &queue_j) {
                 
                 try {
                     auto j = json::parse(whole_data);
-
-                    std::vector<std::vector<std::unordered_map<std::string, std::string>>> cur_frame_data;
-
-                	std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
-                	for(auto& obj: j["obj"]){
-                		cur_frame_objs.push_back({
-                			{"x", std::to_string(obj["x"].get<float>())},
-                			{"y", std::to_string(obj["y"].get<float>())},
-                			{"cls", obj["cls"].get<std::string>()},
-                			{"ang", std::to_string(obj["ang"].get<float>())},
-                		});
-                	}
-                    cur_frame_data.push_back(cur_frame_objs);
-
-                    // std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
-                    // for(auto& dot: j["dot"]){
-                	// 	cur_frame_dots.push_back({
-                	// 		{"x", std::to_string(dot["x"].get<float>())},
-                	// 		{"y", std::to_string(dot["y"].get<float>())},
-                	// 		{"cls", std::to_string(dot["cls"].get<float>())},
-                	// 	});
-                	// }
-                    // cur_frame_data.push_back(cur_frame_dots);
-
+                    // int dot_amount = 0;
+                    // for(auto& dot: j["dot"]) {
+                    //     dot_amount += dot["x"].size();
+                    // }
+                    // std::cout << "dot amount: " << dot_amount << std::endl;
                     queue_j.push(j);
                 }
                 catch (const std::exception& e){
                     std::cout << e.what() << std::endl;
                 }
                 
-            
                 whole_data = "";
                 whole_data += data_cat;
-
-                // 需手動將 buffer 清空
-                memset(indata, 0, sizeof(indata));
             }
             else {
                 data_cat = "";
-                whole_data += data_split[0];
-
-                // 搞很久
-                // 需手動將 buffer 清空
-                memset(indata, 0, sizeof(indata));
+                whole_data += data_split[0];     
             }
+            // 搞很久
+            // 需手動將 buffer 清空
+            memset(indata, 0, sizeof(indata));
         }
     }
 }

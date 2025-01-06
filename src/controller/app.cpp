@@ -49,31 +49,86 @@ void App::run() {
 
 void App::draw_screen() {
 	// 繪製道路物件
+	int obj_scale = 40;
 	for(auto& obj: cur_frame_data["obj"]) {
-		float coord_x = -obj["y"].get<float>() * 35 + 5;
-		float coord_y = -obj["x"].get<float>() * 35 ;
+		float coord_x = -obj["x"].get<float>() * obj_scale;	
+		float coord_y = -obj["y"].get<float>() * obj_scale + 5;		
 		float angle = obj["ang"].get<float>() + 180;
 		std::string obj_name = obj["cls"].get<std::string>();
 		TransformComponent transform;
-		transform.position = {coord_x, coord_y, 0.0f};
+		transform.position = {coord_y, coord_x , 0.0f};
 		transform.eulers = {0.0f, 0.0f, angle};
-		renderSystem->draw_model(model_dict[obj_name], transform);
+		// renderSystem->draw_model(model_dict[obj_name], transform);
+		renderSystem->draw_model_ins_mat(model_dict[obj_name], transform);
 	}
 
 	// 繪製道路地圖線
+	// 一次畫一條線的所有點 (調用實例矩陣畫法)
+	int scale = 35;
 	for(auto& dot: cur_frame_data["dot"]) {
+
 		std::vector<float> x_list = dot["x"].get<std::vector<float>>();
 		std::vector<float> y_list = dot["y"].get<std::vector<float>>();
 		std::vector<float> z_list(x_list.size(), 0);
 		std::string dot_class = std::to_string(dot["cls"].get<int>());
 
-		for (int i; i <= x_list.size(); i++) {
-			x_list[i] = x_list[i] * 70 - 35;
-			y_list[i] = y_list[i] * 70 - 35;
-			z_list[i] -= 0.5;
-		}
-		renderSystem->draw_line(model_dict[dot_class], x_list, y_list, z_list);
+		// transform 裡最多兩個輸入範圍
+		std::vector<TransformComponent> positions(x_list.size());
+		std::vector<size_t> indices(x_list.size());
+		// 將 indices 初始化為 (0 ~ x_list.size())
+		std::iota(indices.begin(), indices.end(), 0);
+		std::transform(
+			indices.begin(), indices.end(), positions.begin(),
+			[&](auto idx) {
+				TransformComponent t;
+				t.position = {(y_list[idx] * scale - (scale / 2.0f) + 5),
+							  (x_list[idx] * scale - (scale / 2.0f)), 
+							  z_list[idx]
+							  };
+				t.eulers = {0.0f, 0.0f, 0.0f};
+				return t;
+			});
+		positions = line_interpolation(positions, 15);
+		renderSystem->draw_line_dots(model_dict[dot_class], positions);
+	
 	}
+}
+
+std::vector<TransformComponent> App::line_interpolation(
+    std::vector<TransformComponent>& positions, 
+    int num_points) {
+    std::vector<TransformComponent> result;
+
+    // 確保至少有兩個點進行插值
+    if (positions.size() < 2 || num_points <= 0) {
+        return result;
+    }
+
+    // 遍歷所有相鄰點對進行插值
+    for (size_t i = 0; i < positions.size() - 1; ++i) {
+        const auto& start = positions[i];
+        const auto& end = positions[i + 1];
+
+        // 在 [0, 1) 區間生成 `num_points` 個比例值
+        for (int j = 0; j < num_points; ++j) {
+            float t = static_cast<float>(j) / static_cast<float>(num_points);
+
+            // 插值計算位置
+            TransformComponent interpolated;
+            interpolated.position = {
+                start.position[0] + t * (end.position[0] - start.position[0]),
+                start.position[1] + t * (end.position[1] - start.position[1]),
+                start.position[2] + t * (end.position[2] - start.position[2])
+            };
+
+            // 如果需要插值歐拉角，這裡可以加入類似計算
+            interpolated.eulers = start.eulers; // 默認不變，根據需求修改
+
+            result.push_back(interpolated);
+        }
+    }
+
+    return result;
 }
 
 void App::set_up_glfw() {
@@ -109,9 +164,10 @@ void App::set_up_opengl() {
 	glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    shader = make_shader(
-		"src/shaders/vertex.txt", 
-		"src/shaders/fragment.txt");
+	shader = make_shader(
+		"src/shaders/vertex_i.txt", 
+		"src/shaders/fragment.txt"
+	);
 
     // 設定接下來繪製時要用的 shader 程式
     glUseProgram(shader);
@@ -134,6 +190,7 @@ void App::draw_ego_car() {
 	TransformComponent transform;
 	transform.position = {5.0f, 0.0f, 0.0f};
 	transform.eulers = {0.0f, 0.0f, 0.0f};
-	renderSystem->draw_model(model_dict["ego_car"], transform);
+	// renderSystem->draw_model(model_dict["ego_car"], transform);
+	renderSystem->draw_model_ins_mat(model_dict["ego_car"], transform);
 }
 

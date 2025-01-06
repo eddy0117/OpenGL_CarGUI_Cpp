@@ -16,6 +16,14 @@ public:
         RenderComponent& renderable, 
         TransformComponent& transform);
 
+    void draw_model_ins_mat(
+        RenderComponent& renderable, 
+        TransformComponent& transform);
+
+    void draw_line_dots(
+        RenderComponent& renderable, 
+        std::vector<TransformComponent>& positions);
+
     void draw_line(
         RenderComponent& renderable, 
         std::vector<float>& x_list,

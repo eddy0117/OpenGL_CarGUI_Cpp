@@ -33,6 +33,11 @@ private:
     void clear_last_frame_data();
     void draw_screen();
     void draw_ego_car();
+
+    std::vector<TransformComponent> line_interpolation(
+        std::vector<TransformComponent>& positions, 
+        int num_points);
+
     GLFWwindow* window;
 
     unsigned int shader;

@@ -23,7 +23,7 @@ int main() {
 		{"traffic_cone", {"cone.obj", "cone.png"}},
 		{"car", {"modern_car.obj", "modern_car.jpg"}},
 		{"0", {"cube.obj", "side.png"}},
-		{"1", {"cube.obj", "crossroas.png"}},
+		{"1", {"cube.obj", "crossroad.png"}},
 		{"2", {"cube.obj", "roadline.png"}},
 
 	};

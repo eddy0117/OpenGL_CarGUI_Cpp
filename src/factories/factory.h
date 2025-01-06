@@ -34,9 +34,10 @@ private:
     std::vector<unsigned int> textures;
 
     // src path prefix
+    // std::string model_path_prefix = "../src/models/";
+    // std::string img_path_prefix = "../src/img/";
     std::string model_path_prefix = "models/";
     std::string img_path_prefix = "img/";
-
 
     RenderComponent make_obj_mesh(
         const char* filepath, glm::mat4 preTransform);
