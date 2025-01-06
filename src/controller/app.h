@@ -31,7 +31,8 @@ public:
 private:
     void set_up_glfw();
     void clear_last_frame_data();
-    void draw_screen();
+    void draw_objs();
+    void draw_lines();
     void draw_ego_car();
 
     std::vector<TransformComponent> line_interpolation(
@@ -44,7 +45,7 @@ private:
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
     // std::queue<std::vector<std::vector<std::unordered_map<std::string, std::string>>>> frame_queue;
-    std::queue<nlohmann::json> queue_j;
+    std::queue<nlohmann::json> queue_json;
     nlohmann::json cur_frame_data;
     //Systems
     CameraSystem* cameraSystem;

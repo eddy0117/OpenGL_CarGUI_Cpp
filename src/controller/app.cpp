@@ -15,7 +15,7 @@ App::~App() {
 
 void App::run() {
 	
-	std::thread socket_thread(recv_data, std::ref(queue_j)); 
+	std::thread socket_thread(recv_data, std::ref(queue_json)); 
 
 	cameraSystem->update(
 		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
@@ -30,24 +30,23 @@ void App::run() {
 		// 處理 eventloop 的所有 event, ESC 跳出指令才會觸發
 		glfwPollEvents();
 
-		if (!queue_j.empty()) {
+		if (!queue_json.empty()) {
 			clear_last_frame_data();
-
-			cur_frame_data = queue_j.front();
-			queue_j.pop();
-			// std::cout << cur_frame_data["obj"] << std::endl;
+			cur_frame_data = queue_json.front();
+			queue_json.pop();
 		}
 		
 
 		draw_ego_car();
+		draw_objs();
+		draw_lines();
 
-		draw_screen();
-		
 		glfwSwapBuffers(window);
+
 	}
 }
 
-void App::draw_screen() {
+void App::draw_objs() {
 	// 繪製道路物件
 	int obj_scale = 40;
 	for(auto& obj: cur_frame_data["obj"]) {
@@ -60,9 +59,11 @@ void App::draw_screen() {
 		transform.eulers = {0.0f, 0.0f, angle};
 		// renderSystem->draw_model(model_dict[obj_name], transform);
 		renderSystem->draw_model_ins_mat(model_dict[obj_name], transform);
-	}
+	}	
+}
 
-	// 繪製道路地圖線
+void App::draw_lines() {
+// 繪製道路地圖線
 	// 一次畫一條線的所有點 (調用實例矩陣畫法)
 	int scale = 35;
 	for(auto& dot: cur_frame_data["dot"]) {
@@ -79,7 +80,7 @@ void App::draw_screen() {
 		std::iota(indices.begin(), indices.end(), 0);
 		std::transform(
 			indices.begin(), indices.end(), positions.begin(),
-			[&](auto idx) {
+			[&](size_t idx) {
 				TransformComponent t;
 				t.position = {(y_list[idx] * scale - (scale / 2.0f) + 5),
 							  (x_list[idx] * scale - (scale / 2.0f)), 
@@ -90,45 +91,43 @@ void App::draw_screen() {
 			});
 		positions = line_interpolation(positions, 15);
 		renderSystem->draw_line_dots(model_dict[dot_class], positions);
-	
 	}
 }
 
 std::vector<TransformComponent> App::line_interpolation(
-    std::vector<TransformComponent>& positions, 
-    int num_points) {
-    std::vector<TransformComponent> result;
+	std::vector<TransformComponent>& positions, 
+	int num_points) {
+	std::vector<TransformComponent> result;
 
-    // 確保至少有兩個點進行插值
-    if (positions.size() < 2 || num_points <= 0) {
-        return result;
-    }
+	// 確保至少有兩個點進行插值
+	if (positions.size() < 2 || num_points <= 0) {
+		return result;
+	}
 
-    // 遍歷所有相鄰點對進行插值
-    for (size_t i = 0; i < positions.size() - 1; ++i) {
-        const auto& start = positions[i];
-        const auto& end = positions[i + 1];
+	// 遍歷所有相鄰點對進行插值
+	for (size_t i = 0; i < positions.size() - 1; ++i) {
+		const auto& start = positions[i];
+		const auto& end = positions[i + 1];
 
-        // 在 [0, 1) 區間生成 `num_points` 個比例值
-        for (int j = 0; j < num_points; ++j) {
-            float t = static_cast<float>(j) / static_cast<float>(num_points);
+		// 在 [0, 1) 區間生成 `num_points` 個比例值
+		for (int j = 0; j < num_points; ++j) {
+			float t = static_cast<float>(j) / static_cast<float>(num_points);
 
-            // 插值計算位置
-            TransformComponent interpolated;
-            interpolated.position = {
-                start.position[0] + t * (end.position[0] - start.position[0]),
-                start.position[1] + t * (end.position[1] - start.position[1]),
-                start.position[2] + t * (end.position[2] - start.position[2])
-            };
+			// 插值計算位置
+			TransformComponent interpolated;
+			interpolated.position = {
+				start.position[0] + t * (end.position[0] - start.position[0]),
+				start.position[1] + t * (end.position[1] - start.position[1]),
+				start.position[2] + t * (end.position[2] - start.position[2])
+			};
 
-            // 如果需要插值歐拉角，這裡可以加入類似計算
-            interpolated.eulers = start.eulers; // 默認不變，根據需求修改
+			interpolated.eulers = start.eulers; 
 
-            result.push_back(interpolated);
-        }
-    }
+			result.push_back(interpolated);
+		}
+	}
 
-    return result;
+	return result;
 }
 
 void App::set_up_glfw() {

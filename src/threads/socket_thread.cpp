@@ -7,7 +7,7 @@
 
 
 
-void recv_data(std::queue<json> &queue_j) {
+void recv_data(std::queue<json> &queue_json) {
 	// frame_queue 要以 ref 傳入
 
 	// json j;
@@ -70,7 +70,7 @@ void recv_data(std::queue<json> &queue_j) {
                     //     dot_amount += dot["x"].size();
                     // }
                     // std::cout << "dot amount: " << dot_amount << std::endl;
-                    queue_j.push(j);
+                    queue_json.push(j);
                 }
                 catch (const std::exception& e){
                     std::cout << e.what() << std::endl;
