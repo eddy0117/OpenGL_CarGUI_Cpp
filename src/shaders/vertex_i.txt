@@ -3,7 +3,7 @@
 layout (location=0) in vec3 vertexPos;
 layout (location=1) in vec2 vertexTexCoord;
 layout (location=2) in vec3 vertexNormal;
-layout(location = 3) in mat4 instance_matrix;  // 實例的變換矩陣
+layout (location = 3) in mat4 instance_matrix;  // 實例的變換矩陣
 
 out vec2 fragmentTexCoord;
 out vec3 fragmentNormal;

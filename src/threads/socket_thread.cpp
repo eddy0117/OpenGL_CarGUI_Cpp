@@ -4,7 +4,7 @@
 
 #define port 65432
 #define ip_addr "127.0.0.1"
-
+#define MAX_CHUNK_SIZE 5000
 
 
 void recv_data(std::queue<json> &queue_json) {
@@ -15,7 +15,6 @@ void recv_data(std::queue<json> &queue_json) {
 	// jfile >> j;
 	// jfile.close();
     
-    int MAX_CHUNK_SIZE = 5000;
     int sockfd, newfd;
     socklen_t addrlen;
 	struct sockaddr_in serverAddr, clientAddr;
@@ -41,8 +40,8 @@ void recv_data(std::queue<json> &queue_json) {
 
     addrlen = sizeof(clientAddr);
     while(1){
-        // BUG? 不能定義 MAX_CHUNK_SIZE 變數, 只能直接輸入值到宣告的長度
-        char indata[5000] = {0};
+
+        char indata[MAX_CHUNK_SIZE] = {0};
         std::string whole_data, data_cat;
         // 阻塞, 直到有新連接
         newfd = accept(sockfd, (struct sockaddr *)&clientAddr, &addrlen);
@@ -65,11 +64,7 @@ void recv_data(std::queue<json> &queue_json) {
                 
                 try {
                     auto j = json::parse(whole_data);
-                    // int dot_amount = 0;
-                    // for(auto& dot: j["dot"]) {
-                    //     dot_amount += dot["x"].size();
-                    // }
-                    // std::cout << "dot amount: " << dot_amount << std::endl;
+           
                     queue_json.push(j);
                 }
                 catch (const std::exception& e){
