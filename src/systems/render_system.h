@@ -24,6 +24,11 @@ public:
         RenderComponent& renderable, 
         std::vector<TransformComponent>& positions);
 
+    void draw_occ_dots(
+        RenderComponent& renderable, 
+        unsigned int color,
+        std::vector<TransformComponent>& positions);
+
     void draw_line(
         RenderComponent& renderable, 
         std::vector<float>& x_list,

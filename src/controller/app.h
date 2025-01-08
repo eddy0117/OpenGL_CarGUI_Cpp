@@ -26,6 +26,7 @@ public:
     unsigned int cameraID;
     std::unordered_map<unsigned int, RenderComponent> renderComponents;
     std::unordered_map<std::string, RenderComponent> model_dict;
+    std::unordered_map<std::string, unsigned int> color_dict;
 
 private:
     void set_up_glfw();
@@ -33,6 +34,7 @@ private:
     void draw_objs();
     void draw_lines();
     void draw_ego_car();
+    void draw_occ_dots();
 
     std::vector<TransformComponent> line_interpolation(
         std::vector<TransformComponent>& positions, 

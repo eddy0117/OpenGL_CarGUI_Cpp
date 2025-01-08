@@ -21,6 +21,9 @@ public:
     std::unordered_map<std::string, RenderComponent>  make_obj_list(std::unordered_map<std::string, std::vector<std::string>> file_path_list,
                                                glm::vec3 eulers);
 
+    std::unordered_map<std::string, unsigned int> make_color_list(
+        std::unordered_map<std::string, std::string> colors_path_list);
+
 private:
 
     unsigned int entities_made = 0;

@@ -40,6 +40,7 @@ void App::run() {
 		draw_ego_car();
 		draw_objs();
 		draw_lines();
+		draw_occ_dots();
 
 		glfwSwapBuffers(window);
 
@@ -91,6 +92,40 @@ void App::draw_lines() {
 			});
 		positions = line_interpolation(positions, 15);
 		renderSystem->draw_line_dots(model_dict[dot_class], positions);
+	}
+}
+
+void App::draw_occ_dots() {
+	// 繪製 3d occupancy dots
+	int scale = 35;
+	float dot_density = 1.8f;
+	std::vector<std::string> cls_black_list = {"2", "4", "6", "7", "10", "16"};
+	for(auto& dot_list: cur_frame_data["occ"].items()) {
+		
+		// 過濾掉黑名單類別
+		if (std::find(cls_black_list.begin(), cls_black_list.end(), dot_list.key()) != cls_black_list.end()) {
+			continue;
+		}
+		std::vector<std::vector<float>> vox_coord_list = dot_list.value();
+		// std::cout << vox_coord_list[0][0] << std::endl;
+		// transform 裡最多兩個輸入範圍
+		std::vector<TransformComponent> positions(vox_coord_list.size());
+		std::vector<size_t> indices(vox_coord_list.size());
+		// 將 indices 初始化為 (0 ~ x_list.size())
+		std::iota(indices.begin(), indices.end(), 0);
+		std::transform(
+			indices.begin(), indices.end(), positions.begin(),
+			[&](size_t idx) {
+				TransformComponent t;
+				t.position = {(vox_coord_list[idx][1] - 100) / dot_density, 
+							 -(vox_coord_list[idx][0] - 100) / dot_density,
+							  (vox_coord_list[idx][2] / dot_density) - 5.0f,
+							 
+							  };
+				t.eulers = {0.0f, 0.0f, 0.0f};
+				return t;
+			});
+		renderSystem->draw_occ_dots(model_dict["occ_dot"], color_dict[dot_list.key()], positions);
 	}
 }
 

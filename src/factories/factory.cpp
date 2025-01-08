@@ -197,3 +197,14 @@ unsigned int Factory::make_texture(const char* filename) {
 
     return texture;
 }
+
+std::unordered_map<std::string, unsigned int> Factory::make_color_list(
+        std::unordered_map<std::string, std::string> colors_path_list) {
+
+    std::unordered_map<std::string, unsigned int> color_dict;
+
+    for(const auto& [cls, path] : colors_path_list) {
+        color_dict[cls] = make_texture((img_path_prefix + path).c_str());
+    }
+    return color_dict;
+}
