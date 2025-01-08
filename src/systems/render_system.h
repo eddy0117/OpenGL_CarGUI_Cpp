@@ -8,9 +8,7 @@ public:
 
     RenderSystem(unsigned int shader, GLFWwindow* window);
     
-    void update(
-        std::unordered_map<unsigned int,TransformComponent> &transformComponents,
-        std::unordered_map<unsigned int,RenderComponent> &renderComponents);
+
     
     void draw_model(
         RenderComponent& renderable, 

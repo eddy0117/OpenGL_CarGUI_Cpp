@@ -49,7 +49,7 @@ int main() {
 	};
 
 	// 產生 unordered map, key 是 obj name, value 是 (texture idx, VAO idx, vertex count)
-	app->model_dict = factory->make_obj_list(file_path_list, {0.0f, 0.0f, 0.0f});
+	app->model_dict = factory->make_obj_list(file_path_list);
 	app->color_dict = factory->make_color_list(colors_path_list);
 	
 	unsigned int cameraEntity = factory->make_camera(

@@ -17,6 +17,7 @@ void App::run() {
 	
 	std::thread socket_thread(recv_data, std::ref(queue_json)); 
 
+	// 開始時設定一次相機視角就好
 	cameraSystem->update(
 		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
 
@@ -98,7 +99,7 @@ void App::draw_lines() {
 void App::draw_occ_dots() {
 	// 繪製 3d occupancy dots
 	int scale = 35;
-	float dot_density = 1.8f;
+	float dot_density = 1.88f;
 	std::vector<std::string> cls_black_list = {"2", "4", "6", "7", "10", "16"};
 	for(auto& dot_list: cur_frame_data["occ"].items()) {
 		

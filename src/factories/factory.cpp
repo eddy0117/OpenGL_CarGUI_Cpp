@@ -28,8 +28,7 @@ unsigned int Factory::make_camera(glm::vec3 position, glm::vec3 eulers) {
 
 // 產出多個物件的 VAO, texture的 dict
 std::unordered_map<std::string, RenderComponent> Factory::make_obj_list(std::unordered_map<std::string, 
-                                                                        std::vector<std::string>> file_path_list, 
-                                                                        glm::vec3 eulers) {
+                                                                        std::vector<std::string>>& file_path_list) {
 	
     std::unordered_map<std::string, RenderComponent> model_dict;
     glm::mat4 preTransform = glm::mat4(0.8f);
@@ -170,10 +169,11 @@ void Factory::read_corner(std::string description,
 unsigned int Factory::make_texture(const char* filename) {
 
     int width, height, channels;
+
+    // stbi 設定讀取時垂直翻轉圖片, 由於 OpenGL UV coords 是以左下角為 (0, 0)
     stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load(
         filename, &width, &height, &channels, STBI_rgb_alpha);
-
 	//make the texture
     unsigned int texture;
 	glGenTextures(1, &texture);
@@ -189,8 +189,11 @@ unsigned int Factory::make_texture(const char* filename) {
 	stbi_image_free(data);
 
     //Configure sampler
+    // 在 U 方向和 V 方向上分別設定 Wrapping (U = S, V = T)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // 上採樣 filter 使用 linear interpolation , 下採樣 filter 使用 nearest
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -199,7 +202,7 @@ unsigned int Factory::make_texture(const char* filename) {
 }
 
 std::unordered_map<std::string, unsigned int> Factory::make_color_list(
-        std::unordered_map<std::string, std::string> colors_path_list) {
+        std::unordered_map<std::string, std::string>& colors_path_list) {
 
     std::unordered_map<std::string, unsigned int> color_dict;
 
