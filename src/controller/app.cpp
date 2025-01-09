@@ -169,17 +169,19 @@ std::vector<TransformComponent> App::line_interpolation(
 void App::set_up_glfw() {
 
     glfwInit();
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);	
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	
 	window = glfwCreateWindow(640, 480, "OpenGL_CarGUI", NULL, NULL);
 	glfwMakeContextCurrent(window);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
+	// glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	
+	// 用 GLad 載入當前版本 OpenGL 的所有 functions
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Couldn't load opengl" << std::endl;
+		std::cout << "Couldn't load GLad" << std::endl;
 		glfwTerminate();
 	}
 

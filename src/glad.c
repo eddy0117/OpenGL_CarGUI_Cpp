@@ -9412,6 +9412,8 @@ int gladLoadGLLoader(GLADloadproc load) {
 	load_GL_VERSION_3_2(load);
 	load_GL_VERSION_3_3(load);
 
+	// 強制載入 glVertexAttribDivisor (for OpenGL ES 3.0)
+	glad_glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)load("glVertexAttribDivisor");
 	if (!find_extensionsGL()) return 0;
 	load_GL_3DFX_tbuffer(load);
 	load_GL_AMD_debug_output(load);

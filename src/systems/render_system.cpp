@@ -141,28 +141,28 @@ void RenderSystem::draw_occ_dots(
 
 }
 
-void RenderSystem::draw_line(
-    RenderComponent& renderable, 
-    std::vector<float>& x_list,
-    std::vector<float>& z_list,
-    std::vector<float>& y_list) {
-    float last_x;
-    float last_z;
-    float last_y;
-    glBindTexture(GL_TEXTURE_2D, renderable.material);
-    glBegin(GL_LINE);
+// void RenderSystem::draw_line(
+//     RenderComponent& renderable, 
+//     std::vector<float>& x_list,
+//     std::vector<float>& z_list,
+//     std::vector<float>& y_list) {
+//     float last_x;
+//     float last_z;
+//     float last_y;
+//     glBindTexture(GL_TEXTURE_2D, renderable.material);
+//     glBegin(GL_LINE);
 
-    for(int i = 0; i <= x_list.size(); i++) {
-        if (i == 0) {
-            last_x = x_list[i];
-            last_z = z_list[i];
-            last_y = y_list[i];
-        }
-        else {
-            glVertex3f(last_x, last_z, last_y);
-            glVertex3f(x_list[i], z_list[i], y_list[i]);
-        }
-    }
-    glEnd();
+//     for(int i = 0; i <= x_list.size(); i++) {
+//         if (i == 0) {
+//             last_x = x_list[i];
+//             last_z = z_list[i];
+//             last_y = y_list[i];
+//         }
+//         else {
+//             glVertex3f(last_x, last_z, last_y);
+//             glVertex3f(x_list[i], z_list[i], y_list[i]);
+//         }
+//     }
+//     glEnd();
 
-}
+// }
