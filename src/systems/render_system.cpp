@@ -101,7 +101,9 @@ void RenderSystem::draw_line_dots(
     glBindTexture(GL_TEXTURE_2D, renderable.material);
 
     glDrawArraysInstanced(GL_TRIANGLES, 0, renderable.vertexCount, transform_list.size());
-    // glDeleteBuffers(1, &ins_VBO);
+
+    // 需要釋放作為存當前幀的 instance matrices 的 VBO, 不然會 memory leak
+    glDeleteBuffers(1, &ins_VBO);
     glBindVertexArray(0);
 
 }
@@ -141,28 +143,43 @@ void RenderSystem::draw_occ_dots(
 
 }
 
-// void RenderSystem::draw_line(
-//     RenderComponent& renderable, 
-//     std::vector<float>& x_list,
-//     std::vector<float>& z_list,
-//     std::vector<float>& y_list) {
-//     float last_x;
-//     float last_z;
-//     float last_y;
-//     glBindTexture(GL_TEXTURE_2D, renderable.material);
-//     glBegin(GL_LINE);
+void RenderSystem::draw_line(
+    RenderComponent& renderable, 
+    std::vector<TransformComponent>& transform) {
 
-//     for(int i = 0; i <= x_list.size(); i++) {
-//         if (i == 0) {
-//             last_x = x_list[i];
-//             last_z = z_list[i];
-//             last_y = y_list[i];
-//         }
-//         else {
-//             glVertex3f(last_x, last_z, last_y);
-//             glVertex3f(x_list[i], z_list[i], y_list[i]);
-//         }
-//     }
-//     glEnd();
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, {0.0f, 0.0f, 0.0f});
 
-// }
+    unsigned int line_VAO;
+    glGenVertexArrays(1, &line_VAO);
+    glBindVertexArray(line_VAO);
+
+    // new line model VBO
+    unsigned int line_VBO;
+    glGenBuffers(1, &line_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, line_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * transform.size(), transform.data(), GL_STATIC_DRAW);
+    
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+
+    unsigned int ins_VBO;
+    glGenBuffers(1, &ins_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, ins_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4), &model, GL_STATIC_DRAW);
+
+    glBindVertexArray(renderable.VAO);
+    
+    for(int i = 0; i < 4; i++) {
+        glEnableVertexAttribArray(3 + i);
+        glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(float) * i * 4));
+        glVertexAttribDivisor(3 + i, 1);
+    }
+    glBindVertexArray(renderable.VAO);
+    glBindTexture(GL_TEXTURE_2D, renderable.material);
+
+    glDrawArraysInstanced(GL_TRIANGLES, 0, renderable.vertexCount, 1);
+    glDeleteBuffers(1, &ins_VBO);
+    glBindVertexArray(0);
+}

@@ -24,7 +24,8 @@ void recv_data(std::queue<json> &queue_json) {
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = inet_aton("localhost", &serverAddr.sin_addr);
+	// serverAddr.sin_addr.s_addr = inet_aton("localhost", &serverAddr.sin_addr);
+    serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serverAddr.sin_port = htons(port);
 
     if (bind(sockfd, (const struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {

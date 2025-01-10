@@ -29,9 +29,7 @@ public:
 
     void draw_line(
         RenderComponent& renderable, 
-        std::vector<float>& x_list,
-        std::vector<float>& z_list,
-        std::vector<float>& y_list);
+        std::vector<TransformComponent>& transform);
     
 private:
 
