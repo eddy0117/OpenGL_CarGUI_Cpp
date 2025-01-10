@@ -3,9 +3,19 @@
 
 
 #define port 65432
-#define ip_addr "127.0.0.1"
+#define ip_addr "192.168.31.126"
 #define MAX_CHUNK_SIZE 5000
 
+std::string decode_utf8(const char *data, size_t length) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    try {
+        // 將資料轉換為 UTF-8 字符串
+        return converter.to_bytes(std::wstring(data, data + length));
+    } catch (const std::exception &e) {
+        std::cerr << "UTF-8 decode error: " << e.what() << std::endl;
+        return "";  // 返回空字串表示失敗
+    }
+}
 
 void recv_data(std::queue<json> &queue_json) {
 	// frame_queue 要以 ref 傳入
@@ -24,7 +34,8 @@ void recv_data(std::queue<json> &queue_json) {
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = inet_aton("localhost", &serverAddr.sin_addr);
+	// serverAddr.sin_addr.s_addr = inet_aton("localhost", &serverAddr.sin_addr);
+    serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serverAddr.sin_port = htons(port);
 
     if (bind(sockfd, (const struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
@@ -53,8 +64,8 @@ void recv_data(std::queue<json> &queue_json) {
                 std::cout << "connection closed" << std::endl;
                 break;
             }
-
-            std::vector<std::string> data_split = split(indata, "~");
+            std::string utf8_data = decode_utf8(indata, nbyte);
+            std::vector<std::string> data_split = split(utf8_data, "~");
 
             if (data_split.size() > 1) {
 

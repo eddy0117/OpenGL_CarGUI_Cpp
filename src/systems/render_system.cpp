@@ -101,7 +101,7 @@ void RenderSystem::draw_line_dots(
     glBindTexture(GL_TEXTURE_2D, renderable.material);
 
     glDrawArraysInstanced(GL_TRIANGLES, 0, renderable.vertexCount, transform_list.size());
-    // glDeleteBuffers(1, &ins_VBO);
+    glDeleteBuffers(1, &ins_VBO);
     glBindVertexArray(0);
 
 }
@@ -136,7 +136,7 @@ void RenderSystem::draw_occ_dots(
     glBindTexture(GL_TEXTURE_2D, color);
 
     glDrawArraysInstanced(GL_TRIANGLES, 0, renderable.vertexCount, transform_list.size());
-    // glDeleteBuffers(1, &ins_VBO);
+    glDeleteBuffers(1, &ins_VBO);
     glBindVertexArray(0);
 
 }
