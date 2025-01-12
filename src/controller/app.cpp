@@ -31,6 +31,7 @@ void App::run() {
 		// 處理 eventloop 的所有 event, ESC 跳出指令才會觸發
 		glfwPollEvents();
 
+		//如果佇列 queue_json 不為空 ，取出新數據更新到 cur_frame_data
 		if (!queue_json.empty()) {
 			clear_last_frame_data();
 			cur_frame_data = queue_json.front();
@@ -189,7 +190,7 @@ void App::set_up_glfw() {
 
 void App::set_up_opengl() {
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);// 設定背景顏色 RGBA
 	//Set the rendering region to the actual screen size
 	int w,h;
 	glfwGetFramebufferSize(window, &w, &h);

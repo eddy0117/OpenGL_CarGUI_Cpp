@@ -33,9 +33,9 @@ std::unordered_map<std::string, RenderComponent> Factory::make_obj_list(std::uno
     std::unordered_map<std::string, RenderComponent> model_dict;
     glm::mat4 preTransform = glm::mat4(0.8f);
 	preTransform = glm::rotate(preTransform, 
-        glm::radians(90.0f), { 1.0f, 0.0f, 0.0f });
+        glm::radians(90.0f), { 1.0f, 0.0f, 0.0f });// 繞 x 軸轉90度
     preTransform = glm::rotate(preTransform, 
-        glm::radians(90.0f), { 0.0f, 1.0f, 0.0f });
+        glm::radians(90.0f), { 0.0f, 1.0f, 0.0f });// 繞 y 軸轉90度
 
     for(const auto& [cls, paths] : file_path_list){
         std::string obj_path = paths[0];
@@ -48,14 +48,14 @@ std::unordered_map<std::string, RenderComponent> Factory::make_obj_list(std::uno
     return model_dict; 
 }
 
-
+// 讀取 .obj 檔案， 建立 OpenGL 的 VAO 和 VBO,將模型數據傳送到 GPU ， 回傳包含 VAO 與頂點數量的 RenderComponent
 RenderComponent Factory::make_obj_mesh(
     const char* filepath, glm::mat4 preTransform) {
 
-    std::vector<glm::vec3> v;
-    std::vector<glm::vec2> vt;
-    std::vector<glm::vec3> vn;
-    std::vector<float> vertices;
+    std::vector<glm::vec3> v;   // 頂點位置
+    std::vector<glm::vec2> vt;  // 紋理座標
+    std::vector<glm::vec3> vn;  // 法向量
+    std::vector<float> vertices; // 展平後的頂點數據 （位置、UV、法向量）
 
     size_t vertexCount = 0;
     size_t texcoordCount = 0;
@@ -68,20 +68,21 @@ RenderComponent Factory::make_obj_mesh(
     std::ifstream file;
 
     file.open(filepath);
+    //解析 3D 模型檔案資料 並存入對應的容器
     while (std::getline(file, line)) {
         words = split(line, " ");
 
         if (!words[0].compare("v")) {
-            v.push_back(read_vec3(words, preTransform, 1.0f));
+            v.push_back(read_vec3(words, preTransform, 1.0f));// 解析頂點
         } 
         else if (!words[0].compare("vt")) {
-            vt.push_back(read_vec2(words));
+            vt.push_back(read_vec2(words));// 紋理座標
         } 
         else if (!words[0].compare("vn")) {
-            vn.push_back(read_vec3(words, preTransform, 0.0f));
+            vn.push_back(read_vec3(words, preTransform, 0.0f));// 法向量
         } 
         else if (!words[0].compare("f")) {
-            read_face(words, v, vt, vn, vertices);
+            read_face(words, v, vt, vn, vertices);// 資料
         }
     }
     file.close();
@@ -131,7 +132,7 @@ void Factory::read_face(std::vector<std::string> words,
     std::vector<glm::vec3>& v, std::vector<glm::vec2>& vt, 
     std::vector<glm::vec3>& vn, std::vector<float>& vertices) {
     
-    size_t triangleCount = words.size() - 3;
+    size_t triangleCount = words.size() - 3; // 計算需要建立多少個三角形
 
     for (size_t i = 0; i < triangleCount; ++i) {
         read_corner(words[1], v, vt, vn, vertices);
@@ -141,6 +142,7 @@ void Factory::read_face(std::vector<std::string> words,
 
 }
 
+// read_corner 函式將 .obj 檔案中的頂點、UV、法向量資訊解析並整合進 vertices
 void Factory::read_corner(std::string description, 
     std::vector<glm::vec3>& v, std::vector<glm::vec2>& vt, 
     std::vector<glm::vec3>& vn, std::vector<float>& vertices) {
@@ -166,6 +168,7 @@ void Factory::read_corner(std::string description,
 
 }
 
+// 載入材質貼圖
 unsigned int Factory::make_texture(const char* filename) {
 
     int width, height, channels;
