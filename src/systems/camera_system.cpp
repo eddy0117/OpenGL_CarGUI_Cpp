@@ -1,13 +1,12 @@
 #include "camera_system.h"
 
-CameraSystem::CameraSystem(unsigned int shader, GLFWwindow* window) {
+CameraSystem::CameraSystem(GLFWwindow* window) {
     this->window = window;
-
-    glUseProgram(shader);
-    viewLocation = glGetUniformLocation(shader, "view");
+    // glUseProgram(shader);
+    // viewLocation = glGetUniformLocation(shader, "view");
 }
 
-bool CameraSystem::update(
+glm::mat4 CameraSystem::get_updated_view(
     std::unordered_map<unsigned int,TransformComponent> &transformComponents,
     unsigned int cameraID, CameraComponent& cameraComponent, float dt) {
 
@@ -30,16 +29,6 @@ bool CameraSystem::update(
 
     glm::mat4 view = glm::lookAt(pos, pos + forwards, up);
 
-    glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
 
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        return true;
-    }
-
-
-    glfwPollEvents();
-
-
-    return false;
+    return view;
 }

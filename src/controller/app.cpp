@@ -18,8 +18,10 @@ void App::run() {
 	std::thread socket_thread(recv_data, std::ref(queue_json)); 
 
 	// 開始時設定一次相機視角就好
-	cameraSystem->update(
+	glm::mat4 view = cameraSystem->get_updated_view(
 		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
+
+	shader_dict["base"]->Uniform4x4fv("view", view);
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -39,6 +41,7 @@ void App::run() {
 		
 
 		draw_ego_car();
+		// renderSystem->draw_line(model_dict["0"]);
 		draw_objs();
 		draw_lines();
 		draw_occ_dots();
@@ -201,21 +204,22 @@ void App::set_up_opengl() {
 	glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-	shader = make_shader(
-		"src/shaders/vertex_i.txt", 
-		"src/shaders/fragment.txt"
-	);
-
-    // 設定接下來繪製時要用的 shader 程式
-    glUseProgram(shader);
-	unsigned int projLocation = glGetUniformLocation(shader, "projection");
+	Shader* base_shader = new Shader(
+		"src/shaders/vertex_i.vert", 
+		"src/shaders/fragment.frag");
+		
+	shader_dict.insert_or_assign("base", base_shader);
+	// 設定接下來繪製時要用的 shader 程式
+	shader_dict["base"]->begin();
+	// unsigned int projLocation = glGetUniformLocation(shader, "projection");
 	glm::mat4 projection = glm::perspective(
 		45.0f, 640.0f / 480.0f, 0.1f, 100.0f);
-	glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projection));
+	shader_dict["base"]->Uniform4x4fv("projection", projection);
+	// glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
 void App::make_systems() {
-    cameraSystem = new CameraSystem(shader, window);
+    cameraSystem = new CameraSystem(window);
     renderSystem = new RenderSystem(shader, window);
 }
 

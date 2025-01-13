@@ -28,8 +28,7 @@ public:
         std::vector<TransformComponent>& positions);
 
     void draw_line(
-        RenderComponent& renderable, 
-        std::vector<TransformComponent>& transform);
+        RenderComponent& renderable);
     
 private:
 

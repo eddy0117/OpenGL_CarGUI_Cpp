@@ -1,6 +1,29 @@
 #include "shader.h"
 
-unsigned int make_shader(
+Shader::Shader(const std::string& filepath, const std::string& fragment_filepath) {
+	// 建立一個可執行的對象容器, 並分別把 vertex shader & fragment shader 放進去
+	shader = glCreateProgram();
+	shader = make_shader(filepath, fragment_filepath);
+}
+
+Shader::~Shader() {
+	glDeleteProgram(shader);
+};
+
+void Shader::begin() {
+	glUseProgram(shader);
+}
+
+void Shader::end() {
+	glUseProgram(0);
+}
+
+void Shader::Uniform4x4fv(const GLchar* var_name, const glm::mat4& value) {
+	unsigned int var_loc = glGetUniformLocation(shader, var_name);
+	glUniformMatrix4fv(var_loc, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+unsigned int Shader::make_shader(
     const std::string& vertex_filepath, const std::string& fragment_filepath) {
 
 	//To store all the shader modules
@@ -12,8 +35,7 @@ unsigned int make_shader(
 	modules.push_back(make_module(vertex_filepath, GL_VERTEX_SHADER));
 	modules.push_back(make_module(fragment_filepath, GL_FRAGMENT_SHADER));
 
-	// 建立一個可執行的對象容器, 並分別把 vertex shader & fragment shader 放進去
-	unsigned int shader = glCreateProgram();
+
 	for (unsigned int shaderModule : modules) {
 		glAttachShader(shader, shaderModule);
 	}
@@ -39,7 +61,7 @@ unsigned int make_shader(
 
 }
 
-unsigned int make_module(const std::string& filepath, unsigned int module_type) {
+unsigned int Shader::make_module(const std::string& filepath, unsigned int module_type) {
 	
 	std::ifstream file;
 	std::stringstream bufferedLines;
