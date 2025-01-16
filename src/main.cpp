@@ -56,7 +56,7 @@ int main() {
 	// 	{-5.0f, 0.0f, 5.0f}, {0.0f, -15.0f, 0.0f});
 
 	unsigned int cameraEntity = factory->make_camera(
-		{-5.0f, 0.0f, 10.0f}, {0.0f, -50.0f, 0.0f});
+		{3.0f, 0.0f, 10.0f}, {0.0f, -80.0f, 0.0f});
 
 	CameraComponent* camera = new CameraComponent();
 	

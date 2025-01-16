@@ -11,6 +11,9 @@
 #include "../view/shader.h"
 
 #include "../threads/socket_thread.h"
+
+#define MAX_LIGHTS 30
+
 class App {
 public:
     App();
@@ -43,9 +46,14 @@ private:
     GLFWwindow* window;
 
     unsigned int shader;
+
+    GLfloat tempArray[MAX_LIGHTS];
+
     glm::mat4 projection;
+
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
+    std::vector<std::pair<float, std::pair<float, float>>> dangerous_objs;
     std::unordered_map<std::string, Shader*> shader_dict;
   
     std::queue<nlohmann::json> queue_json;

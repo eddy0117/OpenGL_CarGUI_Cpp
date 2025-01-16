@@ -28,3 +28,5 @@
 
 
 std::vector<std::string> split(std::string line, std::string delimiter);
+
+float cal_distance(std::pair<float, float> p1, std::pair<float, float> p2);

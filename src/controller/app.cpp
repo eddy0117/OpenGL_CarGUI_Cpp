@@ -1,6 +1,6 @@
 #include "app.h"
 
-#define MAX_LIGHTS 10
+
 
 App::App() {
 	set_up_glfw();
@@ -43,6 +43,12 @@ void App::run() {
 			queue_json.pop();
 		}
 		
+
+
+		draw_objs();
+		draw_lines();
+		draw_occ_dots();
+
 		switch_to_other_shader(shader_dict["ego"]);
 		shader_dict["ego"]->set_proj_view_mat(projection, view);
 		if(offset > 5.0f) {
@@ -52,10 +58,6 @@ void App::run() {
 		offset += 0.02;
 		switch_to_other_shader(shader_dict["base"]);
 		shader_dict["base"]->set_proj_view_mat(projection, view);
-
-		draw_objs();
-		draw_lines();
-		draw_occ_dots();
 
 		glfwSwapBuffers(window);
 
@@ -76,6 +78,14 @@ void App::draw_objs() {
 		float coord_y = -obj["y"].get<float>() * obj_scale + 5;		
 		float angle = obj["ang"].get<float>() + 180;
 		std::string obj_name = obj["cls"].get<std::string>();
+
+		// 計算與原點距離 (給 BEV mode 使用)
+		if(obj_name == "car") {
+			float distance = cal_distance({coord_y, coord_x}, {0.0f, 0.0f});
+			dangerous_objs.push_back({distance, {coord_y, coord_x}});
+		}
+		
+
 		TransformComponent transform;
 		transform.position = {coord_y, coord_x , 0.0f};
 		transform.eulers = {0.0f, 0.0f, angle};
@@ -249,27 +259,37 @@ void App::make_systems() {
 
 void App::clear_last_frame_data() {
 	cur_frame_objs.clear();
+	
 }
 
 void App::draw_ego_car(float offset) {
 
-	std::vector<glm::vec3> lightPosVec = {
-		{3.0f + offset, -2.0f, 2.0f},
-		{2.0f, -2.0f + offset, 1.0f},
-		// ... 其他光源位置 ...
-	};
-	unsigned int num_lights = lightPosVec.size();
+	sort(dangerous_objs.begin(), dangerous_objs.end(), 
+	[](const std::pair<float, std::pair<float, float>>& a, 
+	   const std::pair<float, std::pair<float, float>>& b) {
+			return a.first < b.first;
+	   });
+	if(dangerous_objs.size() >= 10) {
+		dangerous_objs.resize(10);
+	}
 
-	GLfloat tempArray[MAX_LIGHTS];
-    for(int i = 0; i < num_lights; i++){
-        tempArray[i * 3 + 0] = lightPosVec[i].x;
-        tempArray[i * 3 + 1] = lightPosVec[i].y;
-        tempArray[i * 3 + 2] = lightPosVec[i].z;
-    }
+	unsigned int num_lights = dangerous_objs.size();
+
+	if(num_lights > 0) {
+		memset(tempArray, 0, sizeof(tempArray));
+    	for(int i = 0; i < num_lights; i++){
+			tempArray[i * 3 + 0] = dangerous_objs[i].second.first;
+			tempArray[i * 3 + 1] = dangerous_objs[i].second.second;
+			tempArray[i * 3 + 2] = 2.0f;
+		}
 
 
-	shader_dict["ego"]->Uniform1i("numLights", num_lights);
-	shader_dict["ego"]->Uniform3fv_arr("lightPositions", tempArray, num_lights);
+		shader_dict["ego"]->Uniform1i("numLights", num_lights);
+		shader_dict["ego"]->Uniform3fv_arr("lightPositions", tempArray, num_lights);
+
+		dangerous_objs.clear();
+	}
+
 	shader_dict["ego"]->draw_model(model_dict["ego_car"], ego_car_pos);
 	// renderSystem->draw_model_ins_mat(model_dict["ego_car"], transform);
 

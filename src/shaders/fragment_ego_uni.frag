@@ -10,7 +10,7 @@ out vec4 screenColor;
 uniform sampler2D material;
 
 // 可自行調整最大光源數上限
-const int MAX_LIGHTS = 10;
+const int MAX_LIGHTS = 50;
 
 // 光源數量
 uniform int numLights;
