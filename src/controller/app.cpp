@@ -1,5 +1,7 @@
 #include "app.h"
 
+#define MAX_LIGHTS 10
+
 App::App() {
 	set_up_glfw();
 }
@@ -21,9 +23,11 @@ void App::run() {
 	glm::mat4 view = cameraSystem->get_updated_view(
 		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
 
-	shader_dict["base"]->Uniform4x4fv("view", view);
-
+	shader_dict["base"]->set_proj_view_mat(projection, view);
+	float offset = 0.0f;
     while (!glfwWindowShouldClose(window)) {
+
+		// auto start = std::chrono::high_resolution_clock::now();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -39,14 +43,27 @@ void App::run() {
 			queue_json.pop();
 		}
 		
+		switch_to_other_shader(shader_dict["ego"]);
+		shader_dict["ego"]->set_proj_view_mat(projection, view);
+		if(offset > 5.0f) {
+			offset = 0.0f;
+		}
+		draw_ego_car(offset);
+		offset += 0.02;
+		switch_to_other_shader(shader_dict["base"]);
+		shader_dict["base"]->set_proj_view_mat(projection, view);
 
-		draw_ego_car();
-		// renderSystem->draw_line(model_dict["0"]);
 		draw_objs();
 		draw_lines();
 		draw_occ_dots();
 
 		glfwSwapBuffers(window);
+
+		// auto end = std::chrono::high_resolution_clock::now();
+		// std::chrono::duration<float, std::milli> duration = end - start;
+
+		// // 輸出單幀時間
+		// std::cout << "Frame time: " << duration.count() << " ms" << std::endl;
 
 	}
 }
@@ -205,17 +222,24 @@ void App::set_up_opengl() {
     glCullFace(GL_BACK);
 
 	Shader* base_shader = new Shader(
-		"src/shaders/vertex_i.vert", 
-		"src/shaders/fragment.frag");
-		
+		"src/shaders/vertex_base.vert", 
+		"src/shaders/fragment_base.frag");
+	Shader* ego_car_shader = new Shader(
+		"src/shaders/vertex_ego.vert", 
+		"src/shaders/fragment_ego_uni.frag");
+	
+	// 設定接下來繪製時要用的 shader 程式	
 	shader_dict.insert_or_assign("base", base_shader);
-	// 設定接下來繪製時要用的 shader 程式
+	shader_dict.insert_or_assign("ego", ego_car_shader);
+	
 	shader_dict["base"]->begin();
 	// unsigned int projLocation = glGetUniformLocation(shader, "projection");
-	glm::mat4 projection = glm::perspective(
+	projection = glm::perspective(
 		45.0f, 640.0f / 480.0f, 0.1f, 100.0f);
-	shader_dict["base"]->Uniform4x4fv("projection", projection);
-	// glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projection));
+
+	// set ego car position
+	ego_car_pos.position = {5.0f, 0.0f, 0.0f};
+	ego_car_pos.eulers = {0.0f, 0.0f, 0.0f};
 }
 
 void App::make_systems() {
@@ -227,11 +251,28 @@ void App::clear_last_frame_data() {
 	cur_frame_objs.clear();
 }
 
-void App::draw_ego_car() {
-	TransformComponent transform;
-	transform.position = {5.0f, 0.0f, 0.0f};
-	transform.eulers = {0.0f, 0.0f, 0.0f};
-	// renderSystem->draw_model(model_dict["ego_car"], transform);
-	renderSystem->draw_model_ins_mat(model_dict["ego_car"], transform);
+void App::draw_ego_car(float offset) {
+
+	std::vector<glm::vec3> lightPosVec = {
+		{3.0f + offset, -2.0f, 2.0f},
+		{2.0f, -2.0f + offset, 1.0f},
+		// ... 其他光源位置 ...
+	};
+	unsigned int num_lights = lightPosVec.size();
+
+	GLfloat tempArray[MAX_LIGHTS];
+    for(int i = 0; i < num_lights; i++){
+        tempArray[i * 3 + 0] = lightPosVec[i].x;
+        tempArray[i * 3 + 1] = lightPosVec[i].y;
+        tempArray[i * 3 + 2] = lightPosVec[i].z;
+    }
+
+
+	shader_dict["ego"]->Uniform1i("numLights", num_lights);
+	shader_dict["ego"]->Uniform3fv_arr("lightPositions", tempArray, num_lights);
+	shader_dict["ego"]->draw_model(model_dict["ego_car"], ego_car_pos);
+	// renderSystem->draw_model_ins_mat(model_dict["ego_car"], transform);
+
+
 }
 

@@ -33,7 +33,7 @@ private:
     void clear_last_frame_data();
     void draw_objs();
     void draw_lines();
-    void draw_ego_car();
+    void draw_ego_car(float offset);
     void draw_occ_dots();
 
     std::vector<TransformComponent> line_interpolation(
@@ -43,6 +43,7 @@ private:
     GLFWwindow* window;
 
     unsigned int shader;
+    glm::mat4 projection;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
     std::unordered_map<std::string, Shader*> shader_dict;
@@ -52,4 +53,7 @@ private:
     //Systems
     CameraSystem* cameraSystem;
     RenderSystem* renderSystem;
+
+    TransformComponent ego_car_pos;
+
 };

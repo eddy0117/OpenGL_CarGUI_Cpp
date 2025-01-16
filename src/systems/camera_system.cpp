@@ -12,6 +12,8 @@ glm::mat4 CameraSystem::get_updated_view(
 
     glm::vec3& pos = transformComponents[cameraID].position;
     glm::vec3& eulers = transformComponents[cameraID].eulers;
+    // glm::vec3 pos = {0.0f, 0.0f, 0.0f};
+    // glm::vec3 eulers = {0.0f, 0.0f, 0.0f};
     float theta = glm::radians(eulers.z);
     float phi = glm::radians(eulers.y);
 
@@ -26,7 +28,7 @@ glm::mat4 CameraSystem::get_updated_view(
     };
     right = glm::normalize(glm::cross(forwards, global_up));
     up = glm::normalize(glm::cross(right, forwards));
-
+    // pos.z += 5.0f;
     glm::mat4 view = glm::lookAt(pos, pos + forwards, up);
 
 

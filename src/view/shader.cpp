@@ -1,5 +1,11 @@
 #include "shader.h"
 
+void switch_to_other_shader(Shader* target_shader) {
+	glUseProgram(0);
+	target_shader->begin();
+}
+
+
 Shader::Shader(const std::string& filepath, const std::string& fragment_filepath) {
 	// 建立一個可執行的對象容器, 並分別把 vertex shader & fragment shader 放進去
 	shader = glCreateProgram();
@@ -18,9 +24,46 @@ void Shader::end() {
 	glUseProgram(0);
 }
 
+void Shader::draw_model(
+    RenderComponent& renderable, 
+    TransformComponent& transform) {
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, transform.position);
+    model = glm::rotate(
+        model, glm::radians(transform.eulers.z), 
+        { 0.0f, 0.0f, 1.0f });
+    unsigned int modelLocation = glGetUniformLocation(shader, "model");
+    glUniformMatrix4fv(
+        modelLocation, 1, GL_FALSE, 
+        glm::value_ptr(model));
+    
+    glBindTexture(GL_TEXTURE_2D, renderable.material);
+    glBindVertexArray(renderable.VAO);
+
+    // 向 GPU 發出 DrawCall 指令
+    glDrawArrays(GL_TRIANGLES, 0, renderable.vertexCount);
+
+}
+
+void Shader::Uniform1i(const GLchar* var_name, const unsigned int value) {
+	unsigned int var_loc = glGetUniformLocation(shader, var_name);
+	glUniform1i(var_loc, value);	
+}
+
 void Shader::Uniform4x4fv(const GLchar* var_name, const glm::mat4& value) {
 	unsigned int var_loc = glGetUniformLocation(shader, var_name);
 	glUniformMatrix4fv(var_loc, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::Uniform3fv_arr(const GLchar* var_name, const GLfloat* value_arr, const unsigned int num) {
+	unsigned int var_loc = glGetUniformLocation(shader, var_name);
+	glUniform3fv(var_loc, num, value_arr);
+}
+
+void Shader::set_proj_view_mat(const glm::mat4& proj_mat, const glm::mat4& view_mat) {
+	Uniform4x4fv("projection", proj_mat);
+	Uniform4x4fv("view", view_mat);
 }
 
 unsigned int Shader::make_shader(
