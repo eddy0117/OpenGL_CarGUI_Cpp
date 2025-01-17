@@ -42,6 +42,9 @@ private:
     void draw_ego_car();
     void draw_occ_dots();
 
+    void recv_data(); // 改為成員函式
+
+
     std::vector<TransformComponent> line_interpolation(
         std::vector<TransformComponent>& positions, 
         int num_points);

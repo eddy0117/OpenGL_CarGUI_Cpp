@@ -15,14 +15,16 @@ App::~App() {
 
 void App::run() {
 	
-	std::thread socket_thread(recv_data, std::ref(queue_json)); 
+	//std::thread socket_thread(recv_data, std::ref(queue_json)); 
+	std::thread socket_thread(&App::recv_data, this);  
+
 
 	// 開始時設定一次相機視角就好
 	cameraSystem->update(
 		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
 
-    while (!glfwWindowShouldClose(window)) {
 
+    while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -32,11 +34,13 @@ void App::run() {
 		glfwPollEvents();
 
 
-
         {
             // 等待有新數據或程式結束
             std::unique_lock<std::mutex> lock(g_mtx);
             g_cv.wait(lock, [this] { return !queue_json.empty() || g_done.load(); });
+			// g_cv.wait_for(lock, std::chrono::milliseconds(100), [this] {
+            //     return !queue_json.empty() || g_done.load();
+            // });
 
             if (!queue_json.empty()) {
                 cur_frame_data = queue_json.front();
@@ -48,15 +52,6 @@ void App::run() {
         }
 
 
-
-		//如果佇列 queue_json 不為空 ，取出新數據更新到 cur_frame_data
-		// if (!queue_json.empty()) {
-		// 	clear_last_frame_data();
-		// 	cur_frame_data = queue_json.front();
-		// 	queue_json.pop();
-		// }
-		
-		
         // ============================
         //   車用儀表板渲染區域 
 		draw_ego_car();
@@ -66,6 +61,8 @@ void App::run() {
 
 		glfwSwapBuffers(window);
 		// ============================
+
+		std::cout << "[Consumer] Consumed item" << std::endl;
 
 	}
 }

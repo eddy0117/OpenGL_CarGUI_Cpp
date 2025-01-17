@@ -7,7 +7,7 @@
 #define MAX_CHUNK_SIZE 5000
 
 
-void recv_data(std::queue<json> &queue_json) {
+void App::recv_data() {
 	// frame_queue 要以 ref 傳入
 
 	// json j;
@@ -66,13 +66,14 @@ void recv_data(std::queue<json> &queue_json) {
                 try {
                     auto j = json::parse(whole_data);
 
-
                     // 互斥存取區域
+                    {
+                        std::lock_guard<std::mutex> lock(g_mtx);
+                        queue_json.push(j);
+                        std::cout << "[Producer] Produced JSON data." << std::endl;
+                    }
+                    g_cv.notify_one();  // 通知消費者
 
-                    queue_json.push(j);
-
-
-                    
                 }
                 catch (const std::exception& e){
                     std::cout << e.what() << std::endl;
