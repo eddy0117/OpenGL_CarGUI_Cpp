@@ -65,9 +65,10 @@ private:
     nlohmann::json cur_frame_data;
 
     // 多執行緒同步資源
-    std::mutex mtx;
-    std::condition_variable cv;
-    std::atomic<bool> done{false};
+    std::mutex g_mtx;
+    std::condition_variable g_cv;
+    std::atomic<bool> g_done{false};  // 建議使用{}
+
 
     // 記錄 Producer 通知時間與 Consumer 處理時間
     std::unordered_map<int, std::chrono::high_resolution_clock::time_point> g_notify_times;

@@ -31,12 +31,30 @@ void App::run() {
 		// 處理 eventloop 的所有 event, ESC 跳出指令才會觸發
 		glfwPollEvents();
 
+
+
+        {
+            // 等待有新數據或程式結束
+            std::unique_lock<std::mutex> lock(g_mtx);
+            g_cv.wait(lock, [this] { return !queue_json.empty() || g_done.load(); });
+
+            if (!queue_json.empty()) {
+                cur_frame_data = queue_json.front();
+                queue_json.pop();
+            } else if (g_done.load()) {
+                std::cout << "[Consumer] No more data. Exiting..." << std::endl;
+                break;
+            }
+        }
+
+
+
 		//如果佇列 queue_json 不為空 ，取出新數據更新到 cur_frame_data
-		if (!queue_json.empty()) {
-			clear_last_frame_data();
-			cur_frame_data = queue_json.front();
-			queue_json.pop();
-		}
+		// if (!queue_json.empty()) {
+		// 	clear_last_frame_data();
+		// 	cur_frame_data = queue_json.front();
+		// 	queue_json.pop();
+		// }
 		
 		
         // ============================
