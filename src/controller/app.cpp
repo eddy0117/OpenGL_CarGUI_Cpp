@@ -38,13 +38,16 @@ void App::run() {
 			queue_json.pop();
 		}
 		
-
+		
+        // ============================
+        //   車用儀表板渲染區域 
 		draw_ego_car();
 		draw_objs();
 		draw_lines();
 		draw_occ_dots();
 
 		glfwSwapBuffers(window);
+		// ============================
 
 	}
 }

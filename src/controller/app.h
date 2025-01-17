@@ -11,6 +11,12 @@
 #include "../view/shader.h"
 
 #include "../threads/socket_thread.h"
+
+// 同步相關
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
 class App {
 public:
     App();
@@ -46,9 +52,24 @@ private:
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
   
-    std::queue<nlohmann::json> queue_json;
-    nlohmann::json cur_frame_data;
+    // std::queue<nlohmann::json> queue_json;
+    // nlohmann::json cur_frame_data;
+
     //Systems
     CameraSystem* cameraSystem;
     RenderSystem* renderSystem;
+
+
+    //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+    std::queue<nlohmann::json> queue_json;  // 生產者佇列
+    nlohmann::json cur_frame_data;
+
+    // 多執行緒同步資源
+    std::mutex mtx;
+    std::condition_variable cv;
+    std::atomic<bool> done{false};
+
+    // 記錄 Producer 通知時間與 Consumer 處理時間
+    std::unordered_map<int, std::chrono::high_resolution_clock::time_point> g_notify_times;
+
 };
