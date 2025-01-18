@@ -39,9 +39,20 @@ run GUI
 
 
 
+## test
 
 
+```
+chmod +x run_test.sh
+```
+```
+/run_test.sh
+```
 
+```
+gnuplot plot_cpu_usage.gp
+xdg-open cpu_usage_plot.png
+```
 
 
 

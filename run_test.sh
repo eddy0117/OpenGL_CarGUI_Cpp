@@ -2,45 +2,34 @@
 
 # 測試次數
 TEST_ROUNDS=10
-# GUI 程式啟動等待時間（秒）→ 改為 3 秒
+# GUI 程式啟動等待時間（秒）
 GUI_WARMUP_TIME=3
-# CPU 監控時間（秒）→ 改為 20 秒
+# CPU 監控時間（秒）
 DURATION=20
-# 假設 GUI 程式使用的 PORT
-PORT=65432
+# 統一結果檔案名稱
+PLOT_DATA_FILE="cpu_usage_plot_data.txt"
 
-# 確認 Conda 可用
-if ! command -v conda &> /dev/null; then
-    echo "Conda 未安裝或未正確設定環境變數。"
-    exit 1
-fi
+# 清空舊的資料
+> $PLOT_DATA_FILE
 
 for i in $(seq 1 $TEST_ROUNDS); do
     echo "第 $i 次測試開始"
 
-    # 釋放佔用的端口
-    fuser -k ${PORT}/tcp 2>/dev/null
+    # 釋放 PORT
+    fuser -k 65432/tcp 2>/dev/null
 
-    # 啟動 GUI 程式（背景執行）
+    # 啟動 GUI 程式
     ./build/OpenGL_CarGUI &
     APP_PID=$!
 
-    # 確認 GUI 程式是否正常啟動
-    sleep 3
-    if ! ps -p $APP_PID > /dev/null; then
-        echo "GUI 程式啟動失敗，跳過第 $i 次測試。"
-        continue
-    fi
-
-    echo "GUI 程式 PID: $APP_PID，開始暖機 $GUI_WARMUP_TIME 秒..."
+    # 暖機
     sleep $GUI_WARMUP_TIME
 
-    echo "開始記錄 GUI 程式 CPU 使用率..."
-    # 開始記錄 GUI 程式 CPU 使用率
-    pidstat -p $APP_PID 1 $DURATION > result_$i.txt &
+    # 記錄 CPU 使用率
+    pidstat -p $APP_PID 1 $DURATION > temp_pidstat_$i.txt &
     PIDSTAT_PID=$!
 
-    # 啟動 Python 資料發送程式（背景執行）
+    # 執行 Python 程式
     eval "$(conda shell.bash hook)"
     conda activate carguisender_cpp
     cd ./sender
@@ -48,30 +37,26 @@ for i in $(seq 1 $TEST_ROUNDS); do
     PYTHON_PID=$!
     cd ..
 
-    # 確認 Python 程式是否正常啟動
-    sleep 3
-    if ! ps -p $PYTHON_PID > /dev/null; then
-        echo "Python 程式啟動失敗，結束 GUI 程式與監控。"
-        kill $PIDSTAT_PID
-        kill $APP_PID
-        wait $APP_PID 2>/dev/null
-        continue
-    fi
-
-    echo "Python 程式 PID: $PYTHON_PID"
-
-    # 等待 CPU 監控結束
+    # 等待 CPU 記錄結束
     wait $PIDSTAT_PID
 
-    # 測試結束，終止 Python 與 GUI 程式
-    kill $PYTHON_PID
-    wait $PYTHON_PID 2>/dev/null
+    # 轉換 CPU 使用率（從 0 開始編號）
+    awk -v round=$i '
+    BEGIN { idx = 0 }
+    /^[0-9]/ && $9 ~ /^[0-9.]+$/ {
+        print idx, $9
+        idx++
+    }
+    END { print "# 測試輪次 " round " 結束\n" }
+    ' temp_pidstat_$i.txt >> $PLOT_DATA_FILE
 
+    # 結束程序
+    kill $PYTHON_PID
     kill $APP_PID
     wait $APP_PID 2>/dev/null
 
     echo "第 $i 次測試結束"
-    sleep 5  # 減少測試間的干擾
+    sleep 5
 done
 
 echo "所有測試完成"
