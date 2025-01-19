@@ -60,10 +60,10 @@ void App::run() {
 
         // ============================
         //   車用儀表板渲染區域 
-		draw_ego_car();
-		draw_objs();
-		draw_lines();
-		draw_occ_dots();
+		//draw_ego_car();
+		// draw_objs();
+		// draw_lines();
+		// draw_occ_dots();
 
 		switch_to_other_shader(shader_dict["ego"]);
 		shader_dict["ego"]->set_proj_view_mat(projection, view);
@@ -74,6 +74,11 @@ void App::run() {
 		offset += 0.02;
 		switch_to_other_shader(shader_dict["base"]);
 		shader_dict["base"]->set_proj_view_mat(projection, view);
+
+		//更改合併位置
+		draw_objs();
+		draw_lines();
+		draw_occ_dots();
 
 		glfwSwapBuffers(window);
 		// ============================
