@@ -1,4 +1,7 @@
 build/
 out/
 CMakePresets.json
-result_*.txt
+
+temp_pidstat_*.txt
+cpu_usage_plot.png
+cpu_usage_plot_data.txt
