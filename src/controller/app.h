@@ -13,6 +13,10 @@
 #include "../threads/socket_thread.h"
 
 #define MAX_LIGHTS 30
+#define OBJ_SCALE 40
+#define LINE_SCALE 35
+#define MAX_DANGER_DISTANCE 8.0f
+
 
 class App {
 public:
@@ -36,7 +40,7 @@ private:
     void clear_last_frame_data();
     void draw_objs();
     void draw_lines();
-    void draw_ego_car(float offset);
+    void draw_ego_car();
     void draw_occ_dots();
 
     std::vector<TransformComponent> line_interpolation(

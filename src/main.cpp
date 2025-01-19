@@ -52,11 +52,13 @@ int main() {
 	app->model_dict = factory->make_obj_list(file_path_list);
 	app->color_dict = factory->make_color_list(colors_path_list);
 	
+	// Normal mode perspective
 	// unsigned int cameraEntity = factory->make_camera(
 	// 	{-5.0f, 0.0f, 5.0f}, {0.0f, -15.0f, 0.0f});
 
+	// BEV mode perspective
 	unsigned int cameraEntity = factory->make_camera(
-		{3.0f, 0.0f, 10.0f}, {0.0f, -80.0f, 0.0f});
+		{5.0f, 0.0f, 7.0f}, {0.0f, -89.0f, 0.0f});
 
 	CameraComponent* camera = new CameraComponent();
 	

@@ -1,6 +1,6 @@
 #include "shader.h"
 
-void switch_to_other_shader(Shader* target_shader) {
+void switch_to_shader(Shader* target_shader) {
 	glUseProgram(0);
 	target_shader->begin();
 }

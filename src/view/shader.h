@@ -31,4 +31,4 @@ private:
     unsigned int make_module(const std::string& filepath, unsigned int module_type);
 };
 
-void switch_to_other_shader(Shader* target_shader);
+void switch_to_shader(Shader* target_shader);

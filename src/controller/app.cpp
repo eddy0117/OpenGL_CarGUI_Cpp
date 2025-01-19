@@ -49,14 +49,13 @@ void App::run() {
 		draw_lines();
 		draw_occ_dots();
 
-		switch_to_other_shader(shader_dict["ego"]);
+		// 切換 shader 需要重新傳 Uniform 變數
+		switch_to_shader(shader_dict["ego"]);
 		shader_dict["ego"]->set_proj_view_mat(projection, view);
-		if(offset > 5.0f) {
-			offset = 0.0f;
-		}
-		draw_ego_car(offset);
-		offset += 0.02;
-		switch_to_other_shader(shader_dict["base"]);
+	
+		draw_ego_car();
+		
+		switch_to_shader(shader_dict["base"]);
 		shader_dict["base"]->set_proj_view_mat(projection, view);
 
 		glfwSwapBuffers(window);
@@ -72,7 +71,7 @@ void App::run() {
 
 void App::draw_objs() {
 	// 繪製道路物件
-	int obj_scale = 40;
+	int obj_scale = OBJ_SCALE;
 	for(auto& obj: cur_frame_data["obj"]) {
 		float coord_x = -obj["x"].get<float>() * obj_scale;	
 		float coord_y = -obj["y"].get<float>() * obj_scale + 5;		
@@ -82,7 +81,9 @@ void App::draw_objs() {
 		// 計算與原點距離 (給 BEV mode 使用)
 		if(obj_name == "car") {
 			float distance = cal_distance({coord_y, coord_x}, {0.0f, 0.0f});
-			dangerous_objs.push_back({distance, {coord_y, coord_x}});
+			
+			if (distance < MAX_DANGER_DISTANCE) 
+			dangerous_objs.push_back({distance, {coord_y, coord_x}});	
 		}
 		
 
@@ -97,7 +98,7 @@ void App::draw_objs() {
 void App::draw_lines() {
 // 繪製道路地圖線
 	// 一次畫一條線的所有點 (調用實例矩陣畫法)
-	int scale = 35;
+	int line_scale = LINE_SCALE;
 	for(auto& dot: cur_frame_data["dot"]) {
 
 		std::vector<float> x_list = dot["x"].get<std::vector<float>>();
@@ -114,8 +115,8 @@ void App::draw_lines() {
 			indices.begin(), indices.end(), positions.begin(),
 			[&](size_t idx) {
 				TransformComponent t;
-				t.position = {(y_list[idx] * scale - (scale / 2.0f) + 5),
-							  (x_list[idx] * scale - (scale / 2.0f)), 
+				t.position = {(y_list[idx] * line_scale - (line_scale / 2.0f) + 5),
+							  (x_list[idx] * line_scale - (line_scale / 2.0f)), 
 							  z_list[idx]
 							  };
 				t.eulers = {0.0f, 0.0f, 0.0f};
@@ -262,37 +263,37 @@ void App::clear_last_frame_data() {
 	
 }
 
-void App::draw_ego_car(float offset) {
+void App::draw_ego_car() {
+	unsigned int num_objs = dangerous_objs.size();
 
+	// 將 distance 做升冪排序
 	sort(dangerous_objs.begin(), dangerous_objs.end(), 
 	[](const std::pair<float, std::pair<float, float>>& a, 
 	   const std::pair<float, std::pair<float, float>>& b) {
 			return a.first < b.first;
 	   });
-	if(dangerous_objs.size() >= 10) {
+
+	// 保留 top-10 elements
+	if(num_objs >= 10) {
 		dangerous_objs.resize(10);
+		num_objs = dangerous_objs.size();
+	}
+		
+	for(int i = 0; i < num_objs; i++){
+		// dangerous_objs[i]: {distance, {x, y}}
+		tempArray[i * 3 + 0] = dangerous_objs[i].second.first;
+		tempArray[i * 3 + 1] = dangerous_objs[i].second.second;
+		tempArray[i * 3 + 2] = 2.0f;
 	}
 
-	unsigned int num_lights = dangerous_objs.size();
-
-	if(num_lights > 0) {
-		memset(tempArray, 0, sizeof(tempArray));
-    	for(int i = 0; i < num_lights; i++){
-			tempArray[i * 3 + 0] = dangerous_objs[i].second.first;
-			tempArray[i * 3 + 1] = dangerous_objs[i].second.second;
-			tempArray[i * 3 + 2] = 2.0f;
-		}
-
-
-		shader_dict["ego"]->Uniform1i("numLights", num_lights);
-		shader_dict["ego"]->Uniform3fv_arr("lightPositions", tempArray, num_lights);
-
-		dangerous_objs.clear();
-	}
-
+	shader_dict["ego"]->Uniform1i("numLights", num_objs);
+	shader_dict["ego"]->Uniform3fv_arr("lightPositions", tempArray, num_objs);
+	
 	shader_dict["ego"]->draw_model(model_dict["ego_car"], ego_car_pos);
 	// renderSystem->draw_model_ins_mat(model_dict["ego_car"], transform);
-
-
+	// 清除工作
+	memset(tempArray, 0, sizeof(tempArray));
+	dangerous_objs.clear();
+	
 }
 

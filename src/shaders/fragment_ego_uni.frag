@@ -43,8 +43,8 @@ void main()
         diff *= attenuation;
 
         // 可依需求調整光照顏色、強度
-        vec3 lightColor = diff * vec3(1.0, 0.0, 0.0) * 1.5;
-        vec3 lightColor2 = diff * vec3(1.0, 0.0, 0.0) * 1.0;
+        vec3 lightColor = diff * vec3(1.0, 0.0, 0.0) * 2.0;
+        // vec3 lightColor2 = diff * vec3(1.0, 0.0, 0.0) * 1.0;
         finalColor = vec3(finalColor.x + lightColor.x, finalColor.y - (0.7 * lightColor.x), finalColor.z - lightColor.x);
         // finalColor = vec3(finalColor.x + (0.5 * lightColor2.x), finalColor.y - (0.7 * lightColor2.x), finalColor.z - lightColor2.x);
     }
