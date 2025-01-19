@@ -17,6 +17,8 @@
 #include <condition_variable>
 #include <atomic>
 
+#define MAX_LIGHTS 30
+
 class App {
 public:
     App();
@@ -39,7 +41,7 @@ private:
     void clear_last_frame_data();
     void draw_objs();
     void draw_lines();
-    void draw_ego_car();
+    void draw_ego_car(float offset);
     void draw_occ_dots();
 
     void recv_data(); // 改為成員函式
@@ -52,8 +54,15 @@ private:
     GLFWwindow* window;
 
     unsigned int shader;
+
+    GLfloat tempArray[MAX_LIGHTS];
+
+    glm::mat4 projection;
+
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
+    std::vector<std::pair<float, std::pair<float, float>>> dangerous_objs;
+    std::unordered_map<std::string, Shader*> shader_dict;
   
     // std::queue<nlohmann::json> queue_json;
     // nlohmann::json cur_frame_data;
@@ -75,5 +84,6 @@ private:
 
     // 記錄 Producer 通知時間與 Consumer 處理時間
     std::unordered_map<int, std::chrono::high_resolution_clock::time_point> g_notify_times;
+    TransformComponent ego_car_pos;
 
 };

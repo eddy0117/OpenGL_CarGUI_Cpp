@@ -18,3 +18,10 @@ std::vector<std::string> split(std::string line, std::string delimiter) {
 
     return splitLine;
 }
+
+float cal_distance(std::pair<float, float> p1, std::pair<float, float> p2) {
+  
+   
+    float distance = sqrt(pow(abs(p1.first - p2.first), 2) + pow(abs(p1.second - p2.second), 2));
+    return distance;
+}

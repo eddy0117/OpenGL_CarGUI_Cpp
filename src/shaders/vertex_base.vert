@@ -14,6 +14,7 @@ uniform mat4 projection;
 uniform mat4 view;
 
 void main() {
+    // gl_Position: (x/w, y/w, z/w, w)
     gl_Position = projection * view * instance_matrix * vec4(vertexPos, 1.0);
     fragmentTexCoord = vertexTexCoord;
     fragmentNormal = (instance_matrix * vec4(vertexNormal, 0.0)).xyz;

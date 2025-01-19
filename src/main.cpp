@@ -52,8 +52,11 @@ int main() {
 	app->model_dict = factory->make_obj_list(file_path_list);
 	app->color_dict = factory->make_color_list(colors_path_list);
 	
+	// unsigned int cameraEntity = factory->make_camera(
+	// 	{-5.0f, 0.0f, 5.0f}, {0.0f, -15.0f, 0.0f});
+
 	unsigned int cameraEntity = factory->make_camera(
-		{-5.0f, 0.0f, 5.0f}, {0.0f, -15.0f, 0.0f});
+		{3.0f, 0.0f, 10.0f}, {0.0f, -80.0f, 0.0f});
 
 	CameraComponent* camera = new CameraComponent();
 	
