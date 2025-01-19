@@ -17,7 +17,9 @@ App::~App() {
 
 void App::run() {
 	
-	std::thread socket_thread(recv_data, std::ref(queue_json)); 
+	//std::thread socket_thread(recv_data, std::ref(queue_json)); 
+	std::thread socket_thread(&App::recv_data, this);  
+
 
 	// 開始時設定一次相機視角就好
 	glm::mat4 view = cameraSystem->get_updated_view(
@@ -37,17 +39,31 @@ void App::run() {
 		// 處理 eventloop 的所有 event, ESC 跳出指令才會觸發
 		glfwPollEvents();
 
-		if (!queue_json.empty()) {
-			clear_last_frame_data();
-			cur_frame_data = queue_json.front();
-			queue_json.pop();
-		}
-		
+
+        {
+            // 等待有新數據或程式結束
+            std::unique_lock<std::mutex> lock(g_mtx);
+            g_cv.wait(lock, [this] { return !queue_json.empty() || g_done.load(); });
+			// g_cv.wait_for(lock, std::chrono::milliseconds(100), [this] {
+            //     return !queue_json.empty() || g_done.load();
+            // });
+
+            if (!queue_json.empty()) {
+                cur_frame_data = queue_json.front();
+                queue_json.pop();
+            } else if (g_done.load()) {
+                std::cout << "[Consumer] No more data. Exiting..." << std::endl;
+                break;
+            }
+        }
 
 
-		draw_objs();
-		draw_lines();
-		draw_occ_dots();
+        // ============================
+        //   車用儀表板渲染區域 
+		//draw_ego_car();
+		// draw_objs();
+		// draw_lines();
+		// draw_occ_dots();
 
 		switch_to_other_shader(shader_dict["ego"]);
 		shader_dict["ego"]->set_proj_view_mat(projection, view);
@@ -59,7 +75,15 @@ void App::run() {
 		switch_to_other_shader(shader_dict["base"]);
 		shader_dict["base"]->set_proj_view_mat(projection, view);
 
+		//更改合併位置
+		draw_objs();
+		draw_lines();
+		draw_occ_dots();
+
 		glfwSwapBuffers(window);
+		// ============================
+
+		std::cout << "[Consumer] Consumed item" << std::endl;
 
 		// auto end = std::chrono::high_resolution_clock::now();
 		// std::chrono::duration<float, std::milli> duration = end - start;
@@ -219,7 +243,7 @@ void App::set_up_glfw() {
 
 void App::set_up_opengl() {
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);// 設定背景顏色 RGBA
 	//Set the rendering region to the actual screen size
 	int w,h;
 	glfwGetFramebufferSize(window, &w, &h);

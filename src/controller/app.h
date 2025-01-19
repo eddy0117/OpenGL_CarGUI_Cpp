@@ -12,6 +12,11 @@
 
 #include "../threads/socket_thread.h"
 
+// 同步相關
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
 #define MAX_LIGHTS 30
 
 class App {
@@ -39,6 +44,9 @@ private:
     void draw_ego_car(float offset);
     void draw_occ_dots();
 
+    void recv_data(); // 改為成員函式
+
+
     std::vector<TransformComponent> line_interpolation(
         std::vector<TransformComponent>& positions, 
         int num_points);
@@ -56,12 +64,26 @@ private:
     std::vector<std::pair<float, std::pair<float, float>>> dangerous_objs;
     std::unordered_map<std::string, Shader*> shader_dict;
   
-    std::queue<nlohmann::json> queue_json;
-    nlohmann::json cur_frame_data;
+    // std::queue<nlohmann::json> queue_json;
+    // nlohmann::json cur_frame_data;
+
     //Systems
     CameraSystem* cameraSystem;
     RenderSystem* renderSystem;
 
+
+    //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+    std::queue<nlohmann::json> queue_json;  // 生產者佇列
+    nlohmann::json cur_frame_data;
+
+    // 多執行緒同步資源
+    std::mutex g_mtx;
+    std::condition_variable g_cv;
+    std::atomic<bool> g_done{false};  // 建議使用{}
+
+
+    // 記錄 Producer 通知時間與 Consumer 處理時間
+    std::unordered_map<int, std::chrono::high_resolution_clock::time_point> g_notify_times;
     TransformComponent ego_car_pos;
 
 };

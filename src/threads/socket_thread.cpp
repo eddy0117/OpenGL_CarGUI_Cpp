@@ -7,7 +7,7 @@
 #define MAX_CHUNK_SIZE 5000
 
 
-void recv_data(std::queue<json> &queue_json) {
+void App::recv_data() {
 	// frame_queue 要以 ref 傳入
 
 	// json j;
@@ -35,7 +35,7 @@ void recv_data(std::queue<json> &queue_json) {
     }
     std::cout << "server start at: " << inet_ntoa(serverAddr.sin_addr) << ":" << port << std::endl;
 
-    listen(sockfd, 1);
+    listen(sockfd, 1); //  開始監聽來自客戶端的連線，最多允許 1 個排隊中的連線
 
     std::cout << "wait for connection..." << std::endl;
 
@@ -48,7 +48,7 @@ void recv_data(std::queue<json> &queue_json) {
         newfd = accept(sockfd, (struct sockaddr *)&clientAddr, &addrlen);
         std::cout << "connected by: " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
         while (1) {
-            int nbyte = recv(newfd, indata, sizeof(indata), 0);
+            int nbyte = recv(newfd, indata, sizeof(indata), 0); // 接收資料
             if (nbyte <= 0) {
                 close(newfd);
                 std::cout << "connection closed" << std::endl;
@@ -65,8 +65,15 @@ void recv_data(std::queue<json> &queue_json) {
                 
                 try {
                     auto j = json::parse(whole_data);
-           
-                    queue_json.push(j);
+
+                    // 互斥存取區域
+                    {
+                        std::lock_guard<std::mutex> lock(g_mtx);
+                        queue_json.push(j);
+                        std::cout << "[Producer] Produced JSON data." << std::endl;
+                    }
+                    g_cv.notify_one();  // 通知消費者
+
                 }
                 catch (const std::exception& e){
                     std::cout << e.what() << std::endl;
