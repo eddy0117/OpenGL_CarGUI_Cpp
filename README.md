@@ -39,16 +39,15 @@ run GUI
 
 
 
-## test
-
-
+## performance test
+### Run the CPU performance test script
 ```
 chmod +x run_test.sh
 ```
 ```
 ./run_test.sh
 ```
-
+### Generate a visualization chart
 ```
 gnuplot plot_cpu_usage.gp
 xdg-open cpu_usage_plot.png
