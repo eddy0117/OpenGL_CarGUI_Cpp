@@ -89,6 +89,13 @@
         "__bit_reference": "cpp",
         "__hash_table": "cpp",
         "__tree": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "strstream": "cpp",
+        "source_location": "cpp",
+        "span": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp",
+        "format": "cpp",
+        "stdfloat": "cpp"
     }
 }

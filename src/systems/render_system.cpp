@@ -53,12 +53,12 @@ void RenderSystem::draw_model_ins_mat(
         glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(float) * i * 4));
         glVertexAttribDivisor(3 + i, 1);
     }
-    glBindVertexArray(renderable.VAO);
+    //glBindVertexArray(renderable.VAO); // 好像是多餘的
     glBindTexture(GL_TEXTURE_2D, renderable.material);
 
     glDrawArraysInstanced(GL_TRIANGLES, 0, renderable.vertexCount, 1);
-    glDeleteBuffers(1, &ins_VBO);
-    glBindVertexArray(0);
+    glDeleteBuffers(1, &ins_VBO); // 刪除 VBO，釋放 GPU 記憶體。
+    glBindVertexArray(0); // 解除 VAO 綁定
 }
 
 void RenderSystem::draw_line_dots(
