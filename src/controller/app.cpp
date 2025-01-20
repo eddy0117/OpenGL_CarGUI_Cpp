@@ -26,7 +26,7 @@ void App::run() {
 		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
 
 	shader_dict["base"]->set_proj_view_mat(projection, view);
-	float offset = 0.0f;
+
     while (!glfwWindowShouldClose(window)) {
 
 		// auto start = std::chrono::high_resolution_clock::now();
@@ -47,7 +47,6 @@ void App::run() {
 			// g_cv.wait_for(lock, std::chrono::milliseconds(100), [this] {
             //     return !queue_json.empty() || g_done.load();
             // });
-
             if (!queue_json.empty()) {
                 cur_frame_data = queue_json.front();
                 queue_json.pop();

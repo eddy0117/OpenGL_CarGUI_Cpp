@@ -10,11 +10,6 @@
 void App::recv_data() {
 	// frame_queue 要以 ref 傳入
 
-	// json j;
-	// std::ifstream jfile("../json/result_vec_ordered.json");
-	// jfile >> j;
-	// jfile.close();
-    
     int sockfd, newfd;
     socklen_t addrlen;
 	struct sockaddr_in serverAddr, clientAddr;
@@ -23,8 +18,8 @@ void App::recv_data() {
     // 設定 server 端連接資訊
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
+    // 設定 TCP 連線方式
 	serverAddr.sin_family = AF_INET;
-	// serverAddr.sin_addr.s_addr = inet_aton("localhost", &serverAddr.sin_addr);
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serverAddr.sin_port = htons(port);
 
