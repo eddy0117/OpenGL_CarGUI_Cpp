@@ -70,7 +70,7 @@ void App::recv_data() {
                     {
                         std::lock_guard<std::mutex> lock(g_mtx);
                         queue_json.push(j);
-                        std::cout << "[Producer] Produced JSON data." << std::endl;
+                        // std::cout << "[Producer] Produced JSON data." << std::endl;
                     }
                     g_cv.notify_one();  // 通知消費者
 

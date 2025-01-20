@@ -59,12 +59,7 @@ void App::run() {
 
 
         // ============================
-        //   車用儀表板渲染區域 
-		//draw_ego_car();
-		// draw_objs();
-		// draw_lines();
-		// draw_occ_dots();
-
+  
 		// 切換 shader 需要重新傳 Uniform 變數
 		switch_to_shader(shader_dict["ego"]);
 		shader_dict["ego"]->set_proj_view_mat(projection, view);
@@ -82,7 +77,7 @@ void App::run() {
 		glfwSwapBuffers(window);
 		// ============================
 
-		std::cout << "[Consumer] Consumed item" << std::endl;
+		// std::cout << "[Consumer] Consumed item" << std::endl;
 
 		// auto end = std::chrono::high_resolution_clock::now();
 		// std::chrono::duration<float, std::milli> duration = end - start;
