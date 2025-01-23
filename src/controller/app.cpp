@@ -43,7 +43,7 @@ void App::run() {
         {
             // 等待有新數據或程式結束
             std::unique_lock<std::mutex> lock(g_mtx);
-            g_cv.wait(lock, [this] { return !queue_json.empty() || g_done.load(); });
+            // g_cv.wait(lock, [this] { return !queue_json.empty() || g_done.load(); });
 		
             if (!queue_json.empty()) {
                 cur_frame_data = queue_json.front();
