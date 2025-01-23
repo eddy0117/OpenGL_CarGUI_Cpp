@@ -37,16 +37,14 @@ void App::run() {
 			break;
 		}
 		// 處理 eventloop 的所有 event, ESC 跳出指令才會觸發
-		glfwPollEvents();
-
+		// glfwPollEvents();
+		glfwWaitEvents();
 
         {
             // 等待有新數據或程式結束
             std::unique_lock<std::mutex> lock(g_mtx);
             g_cv.wait(lock, [this] { return !queue_json.empty() || g_done.load(); });
-			// g_cv.wait_for(lock, std::chrono::milliseconds(100), [this] {
-            //     return !queue_json.empty() || g_done.load();
-            // });
+		
             if (!queue_json.empty()) {
                 cur_frame_data = queue_json.front();
                 queue_json.pop();

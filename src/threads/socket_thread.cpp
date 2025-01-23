@@ -67,8 +67,8 @@ void App::recv_data() {
                         queue_json.push(j);
                         // std::cout << "[Producer] Produced JSON data." << std::endl;
                     }
-                    g_cv.notify_one();  // 通知消費者
-
+                    // g_cv.notify_one();  // 通知消費者
+                    glfwPostEmptyEvent();
                 }
                 catch (const std::exception& e){
                     std::cout << e.what() << std::endl;
