@@ -6,6 +6,17 @@
 #define ip_addr "127.0.0.1"
 #define MAX_CHUNK_SIZE 5000
 
+std::string decode_utf8(const char *data, size_t length) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    try {
+        // 將資料轉換為 UTF-8 字符串
+        return converter.to_bytes(std::wstring(data, data + length));
+    } catch (const std::exception &e) {
+        std::cerr << "UTF-8 decode error: " << e.what() << std::endl;
+        return "";  // 返回空字串表示失敗
+    }
+}
+
 
 void App::recv_data() {
 	// frame_queue 要以 ref 傳入
@@ -49,8 +60,9 @@ void App::recv_data() {
                 std::cout << "connection closed" << std::endl;
                 break;
             }
-
-            std::vector<std::string> data_split = split(indata, "~");
+            std::string utf8_data = decode_utf8(indata, nbyte);
+            std::vector<std::string> data_split = split(utf8_data, "~");
+          
 
             if (data_split.size() > 1) {
 
