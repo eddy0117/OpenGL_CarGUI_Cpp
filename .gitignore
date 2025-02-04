@@ -5,3 +5,4 @@ CMakePresets.json
 temp_pidstat_*.txt
 cpu_usage_plot.png
 cpu_usage_plot_data.txt
+cpu_usage_plot_opt.png
