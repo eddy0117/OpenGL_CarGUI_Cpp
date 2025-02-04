@@ -45,7 +45,7 @@ private:
     void clear_last_frame_data();
     void draw_objs();
     void draw_lines();
-    void draw_ego_car();
+    void draw_ego_car_BEV();
     void draw_occ_dots();
 
     void recv_data(); // 改為成員函式
@@ -61,7 +61,9 @@ private:
 
     GLfloat tempArray[MAX_LIGHTS];
 
+    // 將投影矩陣和視圖矩陣宣告為成員變數，方便使用
     glm::mat4 projection;
+    glm::mat4 view;
 
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;

@@ -22,11 +22,11 @@ void App::run() {
 
 
 	// 開始時設定一次相機視角就好
-	glm::mat4 view = cameraSystem->get_updated_view(
+	view = cameraSystem->get_updated_view(
 		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
 
 	shader_dict["base"]->set_proj_view_mat(projection, view);
-
+	int count = 0;
     while (!glfwWindowShouldClose(window)) {
 
 		// auto start = std::chrono::high_resolution_clock::now();
@@ -36,14 +36,18 @@ void App::run() {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 			break;
 		}
+		else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			std::cout << "trigged" << count << std::endl;
+			count++;
+		}
 		// 處理 eventloop 的所有 event, ESC 跳出指令才會觸發
-		// glfwPollEvents();
+		
 		glfwWaitEvents();
 
         {
             // 等待有新數據或程式結束
             std::unique_lock<std::mutex> lock(g_mtx);
-            // g_cv.wait(lock, [this] { return !queue_json.empty() || g_done.load(); });
+            
 		
             if (!queue_json.empty()) {
                 cur_frame_data = queue_json.front();
@@ -56,17 +60,8 @@ void App::run() {
 
 
         // ============================
-  
-		// 切換 shader 需要重新傳 Uniform 變數
-		switch_to_shader(shader_dict["ego"]);
-		shader_dict["ego"]->set_proj_view_mat(projection, view);
 	
-		draw_ego_car();
-		
-		switch_to_shader(shader_dict["base"]);
-		shader_dict["base"]->set_proj_view_mat(projection, view);
-
-		//更改合併位置
+		draw_ego_car_BEV();
 		draw_objs();
 		draw_lines();
 		draw_occ_dots();
@@ -248,6 +243,12 @@ void App::set_up_opengl() {
 	glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+	/*
+		註冊 shader
+		base_shader : 繪製道路物件 & 正常模式的 ego car
+		ego_car_shader : 繪製 BEV mode 的 ego car
+	*/
+
 	Shader* base_shader = new Shader(
 		"src/shaders/vertex_base.vert", 
 		"src/shaders/fragment_base.frag");
@@ -279,7 +280,12 @@ void App::clear_last_frame_data() {
 	
 }
 
-void App::draw_ego_car() {
+void App::draw_ego_car_BEV() {
+
+	// 切換 shader 需要重新傳 Uniform 變數
+	switch_to_shader(shader_dict["ego"]);
+	shader_dict["ego"]->set_proj_view_mat(projection, view);
+
 	unsigned int num_objs = dangerous_objs.size();
 
 	// 將 distance 做升冪排序
@@ -302,14 +308,19 @@ void App::draw_ego_car() {
 		tempArray[i * 3 + 2] = 2.0f;
 	}
 
+	// 設定光照數量(int)和光源位置(float array)至 shader 的 uniform 變數
 	shader_dict["ego"]->Uniform1i("numLights", num_objs);
 	shader_dict["ego"]->Uniform3fv_arr("lightPositions", tempArray, num_objs);
 	
 	shader_dict["ego"]->draw_model(model_dict["ego_car"], ego_car_pos);
-	// renderSystem->draw_model_ins_mat(model_dict["ego_car"], transform);
+	
 	// 清除工作
 	memset(tempArray, 0, sizeof(tempArray));
 	dangerous_objs.clear();
+
+	// 切換回 base shader
+	switch_to_shader(shader_dict["base"]);
+	shader_dict["base"]->set_proj_view_mat(projection, view);
 	
 }
 
