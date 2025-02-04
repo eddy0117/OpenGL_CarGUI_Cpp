@@ -45,6 +45,7 @@ private:
     void clear_last_frame_data();
     void draw_objs();
     void draw_lines();
+    void draw_ego_car();
     void draw_ego_car_BEV();
     void draw_occ_dots();
 
@@ -58,6 +59,8 @@ private:
     GLFWwindow* window;
 
     unsigned int shader;
+    std::string mode = "normal";
+    bool KeyPressed = false;
 
     GLfloat tempArray[MAX_LIGHTS];
 
@@ -91,5 +94,7 @@ private:
     // 記錄 Producer 通知時間與 Consumer 處理時間
     std::unordered_map<int, std::chrono::high_resolution_clock::time_point> g_notify_times;
     TransformComponent ego_car_pos;
+
+
 
 };

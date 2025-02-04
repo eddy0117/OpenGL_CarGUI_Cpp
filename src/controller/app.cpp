@@ -36,9 +36,24 @@ void App::run() {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 			break;
 		}
-		else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			std::cout << "trigged" << count << std::endl;
-			count++;
+
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			// 切換觸發 normal Mode & BEV Mode
+			if (!KeyPressed) {
+				KeyPressed = true;
+				std::cout << "trigged" << count << std::endl;
+				count++;
+				if (mode == "normal") {
+					mode = "BEV";
+				}
+				else {
+					mode = "normal";			
+				}
+				KeyPressed = true;
+			}
+		}
+		else {
+			KeyPressed = false;		
 		}
 		// 處理 eventloop 的所有 event, ESC 跳出指令才會觸發
 		
@@ -60,8 +75,14 @@ void App::run() {
 
 
         // ============================
-	
-		draw_ego_car_BEV();
+
+		if (mode == "normal") {
+			draw_ego_car();
+		}
+		else {
+			draw_ego_car_BEV();
+		}
+
 		draw_objs();
 		draw_lines();
 		draw_occ_dots();
@@ -322,5 +343,13 @@ void App::draw_ego_car_BEV() {
 	switch_to_shader(shader_dict["base"]);
 	shader_dict["base"]->set_proj_view_mat(projection, view);
 	
+}
+
+void App::draw_ego_car() {
+	TransformComponent transform;
+	transform.position = {5.0f, 0.0f, 0.0f};
+	transform.eulers = {0.0f, 0.0f, 0.0f};
+	// renderSystem->draw_model(model_dict["ego_car"], transform);
+	renderSystem->draw_model_ins_mat(model_dict["ego_car"], transform);
 }
 
