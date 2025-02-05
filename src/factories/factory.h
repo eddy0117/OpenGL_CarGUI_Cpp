@@ -8,13 +8,11 @@ class Factory {
 
 public:
     Factory(
-        // std::unordered_map<unsigned int, PhysicsComponent>& physicsComponents,
-        std::unordered_map<unsigned int, RenderComponent>& renderComponents,
-        std::unordered_map<unsigned int, TransformComponent>& transformComponents);
+        std::unordered_map<CamType, TransformComponent>& transformComponents);
     
     ~Factory();
 
-    unsigned int make_camera(glm::vec3 position, glm::vec3 eulers);
+    unsigned int make_camera(glm::vec3 position, glm::vec3 eulers, const CamType& cam_type);
 
     void make_girl(glm::vec3 position, glm::vec3 eulers);
 
@@ -28,9 +26,7 @@ private:
 
     unsigned int entities_made = 0;
 
-    // std::unordered_map<unsigned int, PhysicsComponent>& physicsComponents;
-    std::unordered_map<unsigned int, RenderComponent>& renderComponents;
-    std::unordered_map<unsigned int, TransformComponent>& transformComponents;
+    std::unordered_map<CamType, TransformComponent>& transformComponents;
 
     std::vector<unsigned int> VAOs;
     std::vector<unsigned int> VBOs;

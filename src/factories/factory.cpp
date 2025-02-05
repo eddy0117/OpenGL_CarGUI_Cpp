@@ -2,10 +2,8 @@
 #include "../stb_image.h"
 
 Factory::Factory(
-    std::unordered_map<unsigned int, RenderComponent>& renderComponents,
-    std::unordered_map<unsigned int, TransformComponent>& transformComponents):
-renderComponents(renderComponents),
-transformComponents(transformComponents) {
+    std::unordered_map<CamType, TransformComponent>& transformComponents):
+    transformComponents(transformComponents) {
 }
 
 Factory::~Factory() {
@@ -14,13 +12,13 @@ Factory::~Factory() {
     glDeleteTextures(textures.size(), textures.data());
 }
 
-unsigned int Factory::make_camera(glm::vec3 position, glm::vec3 eulers) {
+unsigned int Factory::make_camera(glm::vec3 position, glm::vec3 eulers, const CamType& cam_type) {
 
     TransformComponent transform;
     transform.position = position;
     transform.eulers = eulers;
 
-    transformComponents[entities_made] = transform;
+    transformComponents[cam_type] = transform;
 
     return entities_made++;
 }

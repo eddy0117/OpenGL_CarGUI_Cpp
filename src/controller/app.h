@@ -33,10 +33,9 @@ public:
 
 
     //Components
-    std::unordered_map<unsigned int, TransformComponent> transformComponents;
+    std::unordered_map<CamType, TransformComponent> transformComponents;
     CameraComponent* cameraComponent;
     unsigned int cameraID;
-    std::unordered_map<unsigned int, RenderComponent> renderComponents;
     std::unordered_map<std::string, RenderComponent> model_dict;
     std::unordered_map<std::string, unsigned int> color_dict;
 
@@ -50,7 +49,7 @@ private:
     void draw_occ_dots();
 
     void recv_data(); // 改為成員函式
-
+    void set_camera();
 
     std::vector<TransformComponent> line_interpolation(
         std::vector<TransformComponent>& positions, 

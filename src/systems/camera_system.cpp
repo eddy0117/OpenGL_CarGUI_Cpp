@@ -7,11 +7,11 @@ CameraSystem::CameraSystem(GLFWwindow* window) {
 }
 
 glm::mat4 CameraSystem::get_updated_view(
-    std::unordered_map<unsigned int,TransformComponent> &transformComponents,
-    unsigned int cameraID, CameraComponent& cameraComponent, float dt) {
+    std::unordered_map<CamType, TransformComponent> &transformComponents,
+    const CamType& cam_type, CameraComponent& cameraComponent, float dt) {
 
-    glm::vec3& pos = transformComponents[cameraID].position;
-    glm::vec3& eulers = transformComponents[cameraID].eulers;
+    glm::vec3& pos = transformComponents[cam_type].position;
+    glm::vec3& eulers = transformComponents[cam_type].eulers;
     // glm::vec3 pos = {0.0f, 0.0f, 0.0f};
     // glm::vec3 eulers = {0.0f, 0.0f, 0.0f};
     float theta = glm::radians(eulers.z);

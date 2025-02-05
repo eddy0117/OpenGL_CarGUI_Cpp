@@ -10,8 +10,7 @@
 int main() {
 
 	App* app = new App();
-	Factory* factory = new Factory(
-		app->renderComponents, app->transformComponents);
+	Factory* factory = new Factory(app->transformComponents);
 		
 	std::unordered_map<std::string, std::string> colors_path_list = {
 		{"0", "0_0_0.png"},
@@ -58,7 +57,7 @@ int main() {
 
 	// BEV mode perspective
 	unsigned int cameraEntity = factory->make_camera(
-		{5.0f, 0.0f, 7.0f}, {0.0f, -89.0f, 0.0f});
+		{5.0f, 0.0f, 7.0f}, {0.0f, -89.0f, 0.0f}, CamType::BEV);
 
 	CameraComponent* camera = new CameraComponent();
 	

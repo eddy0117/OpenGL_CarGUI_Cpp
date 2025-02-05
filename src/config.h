@@ -26,6 +26,10 @@
 #include <chrono>
 #include <nlohmann/json.hpp>
 
+enum class CamType {
+    NORMAL,
+    BEV
+};
 
 std::vector<std::string> split(std::string line, std::string delimiter);
 

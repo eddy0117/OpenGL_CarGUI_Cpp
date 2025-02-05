@@ -19,17 +19,12 @@ void App::run() {
 	
 	//std::thread socket_thread(recv_data, std::ref(queue_json)); 
 	std::thread socket_thread(&App::recv_data, this);  
-
-
-	// 開始時設定一次相機視角就好
-	view = cameraSystem->get_updated_view(
-		transformComponents, cameraID, *cameraComponent, 16.67f/1000.0f);
-
-	shader_dict["base"]->set_proj_view_mat(projection, view);
-	int count = 0;
+	
     while (!glfwWindowShouldClose(window)) {
 
 		// auto start = std::chrono::high_resolution_clock::now();
+	
+		set_camera();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -41,8 +36,6 @@ void App::run() {
 			// 切換觸發 normal Mode & BEV Mode
 			if (!KeyPressed) {
 				KeyPressed = true;
-				std::cout << "trigged" << count << std::endl;
-				count++;
 				if (mode == "normal") {
 					mode = "BEV";
 				}
@@ -289,6 +282,14 @@ void App::set_up_opengl() {
 	// set ego car position
 	ego_car_pos.position = {5.0f, 0.0f, 0.0f};
 	ego_car_pos.eulers = {0.0f, 0.0f, 0.0f};
+}
+
+void App::set_camera() {
+	// 開始時設定一次相機視角就好
+	view = cameraSystem->get_updated_view(
+			transformComponents, CamType::BEV, *cameraComponent, 16.67f/1000.0f);
+
+	shader_dict["base"]->set_proj_view_mat(projection, view);
 }
 
 void App::make_systems() {

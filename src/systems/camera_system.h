@@ -10,8 +10,8 @@ public:
     CameraSystem(GLFWwindow* window);
     
     glm::mat4 get_updated_view(
-        std::unordered_map<unsigned int,TransformComponent> &transformComponents,
-        unsigned int cameraID, CameraComponent& cameraComponent, float dt);
+        std::unordered_map<CamType,TransformComponent> &transformComponents,
+        const CamType& cam_type, CameraComponent& cameraComponent, float dt);
     
 private:
     unsigned int viewLocation;
