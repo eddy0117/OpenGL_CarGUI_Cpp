@@ -52,19 +52,18 @@ int main() {
 	app->color_dict = factory->make_color_list(colors_path_list);
 	
 	// Normal mode perspective
-	// unsigned int cameraEntity = factory->make_camera(
-	// 	{-5.0f, 0.0f, 5.0f}, {0.0f, -15.0f, 0.0f});
+	factory->make_camera(
+		{-5.0f, 0.0f, 5.0f}, {0.0f, -15.0f, 0.0f}, CamType::NORMAL);
 
 	// BEV mode perspective
-	unsigned int cameraEntity = factory->make_camera(
+	factory->make_camera(
 		{5.0f, 0.0f, 7.0f}, {0.0f, -89.0f, 0.0f}, CamType::BEV);
 
 	CameraComponent* camera = new CameraComponent();
 	
 
-
 	app->cameraComponent = camera;
-	app->cameraID = cameraEntity;
+	
 
 	app->set_up_opengl();
 	app->make_systems();

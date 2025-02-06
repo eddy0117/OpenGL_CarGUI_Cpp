@@ -10,7 +10,6 @@ App::~App() {
     glDeleteProgram(shader);
 
     delete cameraSystem;
-    delete renderSystem;
     // std::terminate();
     glfwTerminate();
 }
@@ -285,9 +284,14 @@ void App::set_up_opengl() {
 }
 
 void App::set_camera() {
-	// 開始時設定一次相機視角就好
-	view = cameraSystem->get_updated_view(
-			transformComponents, CamType::BEV, *cameraComponent, 16.67f/1000.0f);
+	if (mode == "normal") {
+		view = cameraSystem->get_updated_view(
+		transformComponents, CamType::NORMAL, *cameraComponent, 16.67f/1000.0f);
+	}
+	else {
+		view = cameraSystem->get_updated_view(
+		transformComponents, CamType::BEV, *cameraComponent, 16.67f/1000.0f);
+	}
 
 	shader_dict["base"]->set_proj_view_mat(projection, view);
 }
