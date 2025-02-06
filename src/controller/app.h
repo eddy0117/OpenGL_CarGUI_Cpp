@@ -42,6 +42,7 @@ public:
 private:
     void set_up_glfw();
     void clear_last_frame_data();
+    void show_ego_car();
     void draw_objs();
     void draw_lines();
     void draw_ego_car();
@@ -50,6 +51,7 @@ private:
 
     void recv_data(); // 改為成員函式
     void set_camera();
+    void update_camera();
 
     std::vector<TransformComponent> line_interpolation(
         std::vector<TransformComponent>& positions, 
@@ -70,8 +72,9 @@ private:
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_objs;
     std::vector<std::unordered_map<std::string, std::string>> cur_frame_dots;
     std::vector<std::pair<float, std::pair<float, float>>> dangerous_objs;
+    
     std::unordered_map<std::string, Shader*> shader_dict;
-  
+    std::unordered_map<std::string, glm::mat4> view_dict;
     // std::queue<nlohmann::json> queue_json;
     // nlohmann::json cur_frame_data;
 

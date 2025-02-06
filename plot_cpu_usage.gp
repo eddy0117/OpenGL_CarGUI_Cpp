@@ -9,4 +9,5 @@ set grid
 set key outside
 
 # 每次測試以不同顏色繪製
-plot for [i=0:*] "cpu_usage_plot_data.txt" index i using 1:2 with lines title sprintf("Test %d", i+1) lw 2
+plot for [i=0:*] "tmp_1/cpu_usage_plot_data.txt" index i using 1:2 with lines title sprintf("Before - %d", i+1) lw 2, \
+     for [i=0:*] "tmp_2/cpu_usage_plot_data.txt" index i using 1:2 with lines title sprintf("After - %d", i+1) lw 2

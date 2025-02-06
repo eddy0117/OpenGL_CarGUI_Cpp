@@ -18,6 +18,7 @@ add_executable(OpenGL_CarGUI
     src/threads/socket_thread.cpp
     src/view/shader.cpp
     src/controller/app.cpp
+    src/controller/drawing.cpp
 )
 
 target_include_directories(OpenGL_CarGUI 
