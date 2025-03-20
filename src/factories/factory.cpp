@@ -12,15 +12,23 @@ Factory::~Factory() {
     glDeleteTextures(textures.size(), textures.data());
 }
 
-unsigned int Factory::make_camera(glm::vec3 position, glm::vec3 eulers, const CamType& cam_type) {
+void Factory::make_camera(std::vector<std::tuple<glm::vec3, glm::vec3, CamType>> cam_params_list) {
 
-    TransformComponent transform;
-    transform.position = position;
-    transform.eulers = eulers;
+    for (const auto& cam_params : cam_params_list) {
+        glm::vec3 position = std::get<0>(cam_params);
+        glm::vec3 eulers = std::get<1>(cam_params);
+        CamType cam_type = std::get<2>(cam_params);
+        
+        TransformComponent transform;
+        transform.position = position;
+        transform.eulers = eulers;
 
-    transformComponents[cam_type] = transform;
+        transformComponents[cam_type] = transform;
 
-    return entities_made++;
+    }
+    
+
+    
 }
 
 

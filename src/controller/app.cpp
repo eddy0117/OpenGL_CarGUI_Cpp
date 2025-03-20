@@ -89,7 +89,8 @@ void App::set_up_glfw() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	
-	window = glfwCreateWindow(640, 480, "OpenGL_CarGUI", NULL, NULL);
+	// window = glfwCreateWindow(640, 480, "OpenGL_CarGUI", NULL, NULL);
+	window = glfwCreateWindow(1600, 1200, "OpenGL_CarGUI", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	
 	// 用 GLad 載入當前版本 OpenGL 的所有 functions

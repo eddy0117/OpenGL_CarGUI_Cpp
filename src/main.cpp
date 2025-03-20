@@ -34,12 +34,13 @@ int main() {
 
 	std::unordered_map<std::string, std::vector<std::string>> file_path_list = {
 		{"ego_car", {"SUV.obj", "SUV.jpg"}},
-		{"pedestrian", {"walking_person.obj", "walking_person.jpg"}},
-		{"motorcycyle", {"scooter.obj", "scooter.jpg"}}, 
-		{"truck", {"truck.obj", "truck.jpg"}}, 
+		// {"pedestrian", {"walking_person.obj", "walking_person.jpg"}},
+		{"pedestrian", {"new/pedestrian.obj", "new/pedestrian.jpg"}},
+		{"motorcycyle", {"new/scooter.obj", "new/scooter.jpg"}}, 
+		{"truck", {"new/truck.obj", "new/truck.jpg"}}, 
 		{"bus", {"bus.obj", "bus.jpg"}},
 		{"traffic_cone", {"cone.obj", "cone.png"}},
-		{"car", {"modern_car.obj", "modern_car.jpg"}},
+		{"car", {"new/sedan.obj", "new/sedan.jpg"}},
 		{"0", {"cube.obj", "side.png"}},
 		{"1", {"cube.obj", "crossroad.png"}},
 		{"2", {"cube.obj", "roadline.png"}},
@@ -47,17 +48,18 @@ int main() {
 
 	};
 
+	std::vector<std::tuple<glm::vec3, glm::vec3, CamType>> cam_params_list = {
+		{{-5.0f, 0.0f, 5.0f}, {0.0f, -15.0f, 0.0f}, CamType::NORMAL},
+		{{5.0f, 0.0f, 7.0f}, {0.0f, -89.0f, 0.0f}, CamType::BEV}
+	};
+
 	// 產生 unordered map, key 是 obj name, value 是 (texture idx, VAO idx, vertex count)
 	app->model_dict = factory->make_obj_list(file_path_list);
 	app->color_dict = factory->make_color_list(colors_path_list);
 	
 	// Normal mode perspective
-	factory->make_camera(
-		{-5.0f, 0.0f, 5.0f}, {0.0f, -15.0f, 0.0f}, CamType::NORMAL);
+	factory->make_camera(cam_params_list);
 
-	// BEV mode perspective
-	factory->make_camera(
-		{5.0f, 0.0f, 7.0f}, {0.0f, -89.0f, 0.0f}, CamType::BEV);
 
 	CameraComponent* camera = new CameraComponent();
 	

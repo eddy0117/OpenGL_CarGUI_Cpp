@@ -12,7 +12,7 @@ public:
     
     ~Factory();
 
-    unsigned int make_camera(glm::vec3 position, glm::vec3 eulers, const CamType& cam_type);
+    void make_camera(std::vector<std::tuple<glm::vec3, glm::vec3, CamType>> cam_params_list);
 
     void make_girl(glm::vec3 position, glm::vec3 eulers);
 
