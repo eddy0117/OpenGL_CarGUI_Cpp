@@ -59,6 +59,12 @@ void App::draw_lines() {
 }
 
 void App::draw_occ_dots() {
+
+	// 確認是否有 occupancy dot data
+	if(cur_frame_data.find("occ") == cur_frame_data.end()) {
+		return;
+	}
+
 	// 繪製 3d occupancy dots
 	int scale = 35;
 	float dot_density = 1.88f;
