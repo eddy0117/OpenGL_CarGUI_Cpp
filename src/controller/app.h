@@ -92,10 +92,9 @@ private:
     std::condition_variable g_cv;
     std::atomic<bool> g_done{false};  // 建議使用{}
 
-
-    // 記錄 Producer 通知時間與 Consumer 處理時間
-    std::unordered_map<int, std::chrono::high_resolution_clock::time_point> g_notify_times;
     TransformComponent ego_car_pos;
+
+    std::vector<float> consume_time_list;
 
 
 

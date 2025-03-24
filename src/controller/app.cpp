@@ -67,7 +67,7 @@ void App::run() {
 
 
         // ============================
-
+		auto start = std::chrono::high_resolution_clock::now();
 		show_ego_car();
 
 		draw_objs();
@@ -75,7 +75,23 @@ void App::run() {
 		draw_occ_dots();
 
 		glfwSwapBuffers(window);
+		
+		// std::cout << "[Consumer] Consumed item" << std::endl;
+
+		auto end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float, std::milli> duration = end - start;
+		
+		if (cur_frame_data.empty()) continue;
+
+		consume_time_list.push_back(duration.count());
+		
+		// consume_time_list.push_back(duration.count());
+		// 輸出單幀時間
+		// std::cout << "Frame time: " << duration.count() << " ms" << std::endl;
 	}
+	std:: cout << "max consume time: " << *std::max_element(consume_time_list.begin(), consume_time_list.end()) << " ms" << std::endl;
+	std:: cout << "min consume time: " << *std::min_element(consume_time_list.begin(), consume_time_list.end()) << " ms" << std::endl;
+	std::cout << "Average consume time: " << std::accumulate(consume_time_list.begin(), consume_time_list.end(), 0.0f) / consume_time_list.size() << " ms" << std::endl;
 }
 
 
