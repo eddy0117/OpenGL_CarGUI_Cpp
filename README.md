@@ -22,6 +22,9 @@ cd build
 ```
 cmake ..
 ```
+```
+make
+```
 
 ### 5. Run the GUI
 Switch to the main directory
