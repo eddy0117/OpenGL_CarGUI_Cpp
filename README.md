@@ -11,6 +11,10 @@ sudo apt install libglm-dev
 sudo apt update
 sudo apt install cmake
 ```
+```
+sudo apt update
+sudo apt install build-essential
+```
 
 ### 3. Create a build directory (usually separate from the source code):
 ``` bash
@@ -21,6 +25,9 @@ cd build
 ### 4. Run CMake to generate build system files:
 ```
 cmake ..
+```
+```
+make
 ```
 
 ### 5. Run the GUI
