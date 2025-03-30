@@ -11,6 +11,10 @@ sudo apt install libglm-dev
 sudo apt update
 sudo apt install cmake
 ```
+```
+sudo apt update
+sudo apt install build-essential
+```
 
 ### 3. Create a build directory (usually separate from the source code):
 ``` bash
