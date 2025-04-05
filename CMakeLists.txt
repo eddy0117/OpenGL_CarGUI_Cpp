@@ -3,7 +3,7 @@ project(OpenGL_CarGUI VERSION 1.0.0)
 cmake_policy(SET CMP0072 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # multithreading support
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # multithreading support
 
 find_package(OpenGL REQUIRED)
 
@@ -29,3 +29,8 @@ target_link_libraries(OpenGL_CarGUI
     glfw
     OpenGL::GL ${CMAKE_DL_LIBS}
 )
+
+#自動複製資源資料夾
+file(COPY ${CMAKE_SOURCE_DIR}/src/shaders DESTINATION ${CMAKE_BINARY_DIR}/src)
+file(COPY ${CMAKE_SOURCE_DIR}/img DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/models DESTINATION ${CMAKE_BINARY_DIR})
